@@ -22,7 +22,7 @@
 %%%%%%%%%%%%%%%%%%%%%
 
 % Data.
-root_path = '../UIUCMaterial/data'; % Without last slash.
+root_path = '../Dataset'; % Without last slash.
 
 materials = {'Birch', 'Brick', 'Concrete', 'Corduroy', 'Denim', 'Elm', 'Feathers', 'Fur', 'Hair', 'KnitAran', 'KnitGuernsey', 'Leather', 'Marble', 'Scale', 'Silk', 'Slate', 'Stucco', 'Velour'};
 
@@ -30,7 +30,7 @@ file_names = {'01','02','03','04','05','06','07','08','09','10','11','12'};
 
 img_format = 'png';
 
-markup_file = 'markup.txt';
+markup_file = '../Markups/Machine-Markup-(1.0).txt';
 
 % Classifiers.
 feature_method = 'SIFT'; % PHOW, SIFT or DSIFT.
@@ -143,5 +143,11 @@ fprintf(1, 'TRAINING SET:\n');
 fprintf(1, 'Mean accuracy: %.2f\n', mean_accuracy * 100);
 fprintf(1, 'Min accuracy: %.2f\n', min_accuracy * 100);
 fprintf(1, 'Max accuracy: %.2f\n', max_accuracy * 100);
+
+%%% TESTING %%%
+
+% Test the SVM over the other half of the images.
+%[descriptors, total_descriptors] = get_descriptors(root_path, materials, ...
+%    file_names, img_format, 'SECOND HALF', feature_method);
 
 %keyboard;

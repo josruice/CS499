@@ -1,0 +1,594 @@
+Materials markup:
+
+>> Method:
+
+Classification based on three different parameters: scale, shape and touch.
+
+ - Scale values: fine, medium, coarse.
+ - Shape values: 
+    * Originals: round, extended organized and extended disorganized.
+    * New: flat
+ - Touch: 
+    * Originals: furry, feathers, coarse, bumpy, scratchy and smooth.
+    * New: rubbery, velvety
+
+Each material will have a maximum of three shapes and a minimum of one, and for each of them a value of shape and/or touch.
+
+>> Markup:
+
+Birch
+    Coarse scale is considered the picture itself, while medium scale is a part where the horizontal pattern is not present, and fine scale a little spot in the medium scale.
+
+    - 01: Fine:   Flat, coarse.
+          Medium: Extended disorganized, scratchy.
+          Coarse: Extended organized, scratchy.
+
+    - 02: Fine:   -
+          Medium: Flat, coarse.
+          Coarse: Extended organized, scratchy.
+
+    - 03: [Watermark]
+          Fine:   Flat, coarse.
+          Medium: -
+          Coarse: Extended organized, scratchy.
+
+    - 04: [Watermark][Big crack]
+          Fine: Flat, coarse.
+          Medium: Extended organized, scratchy.
+          Coarse: Round, coarse.
+
+    - 05: Fine:   -
+          Medium: Flat, coarse.
+          Coarse: Extended organized, scratchy.
+
+    - 06: Fine:   Flat, coarse.
+          Medium: -
+          Coarse: Extended organized, scratchy.
+
+Brick
+    Coarse scale is considered the picture itself, while medium scale is a part with a brick and mortar. Fine scale is only the mortar.
+    - 01: Fine:   -
+          Medium: Flat, coarse.
+          Coarse: Extended organized, coarse.
+
+    - 02: Fine:   Flat, scratchy.
+          Medium: Flat, coarse.
+          Coarse: Extended organized, coarse.
+
+    - 03: Fine:   Flat, scratchy.
+          Medium: Flat, coarse.
+          Coarse: Extended organized, scratchy. 
+
+    - 04: Fine:   Flat, scratchy.
+          Medium: Flat, coarse.
+          Coarse: Extended organized, coarse.
+
+    - 05: Fine:   -
+          Medium: Flat, coarse.
+          Coarse: Extended organized, coarse.
+
+    - 06: [GRAFFITI]
+          Fine:   Flat, coarse.
+          Medium: Flat, smooth.
+          Coarse: Extended organized, smooth.
+
+Concrete
+    - 01: Fine:   -
+          Medium: - 
+          Coarse: Flat, coarse.
+
+    - 02: Fine:   -
+          Medium: Flat, coarse.
+          Coarse: Extended disorganized, coarse.
+
+    - 03: Fine:   -
+          Medium: Flat, coarse.
+          Coarse: Extended disorganized, coarse.
+
+    - 04: Fine:   -
+          Medium: -
+          Coarse: Flat, scratchy.
+
+    - 05: Fine:   -
+          Medium: Flat, coarse.
+          Coarse: Extended organized, coarse.
+
+    - 06: Fine:   -
+          Medium: Flat, coarse.
+          Coarse: Extended organized, coarse.
+
+Corduroy
+    - 01: Fine:   -
+          Medium: Extended organized, smooth.
+          Coarse: Extended organized, bumpy.
+
+    - 02: [?]
+          Fine:   Extended organized, velvety.
+          Medium: Extended organized, bumpy.
+          Coarse: Extended disorganized, bumpy. 
+
+    - 03: [?]
+          Fine:   Extended organized, smooth.
+          Medium: Extended organized, bumpy.
+          Coarse: Extended disorganized, bumpy. 
+
+    - 04: Fine:   Extended organized, smooth.
+          Medium: Extended organized, bumpy.
+          Coarse: Extended disorganized, bumpy. 
+
+    - 05: Fine:   Extended organized, velvety.
+          Medium: Extended organized, bumpy.
+          Coarse: Extended disorganized, bumpy.
+
+    - 06: Fine:   -
+          Medium: Extended organized, velvety.
+          Coarse: Extended organized, bumpy.
+
+Denim
+    - 01: Fine:   -
+          Medium: -
+          Coarse: Extended organized, smooth.
+
+    - 02: Fine:   -
+          Medium: -
+          Coarse: Extended organized, smooth.
+
+    - 03: Fine:   -
+          Medium: Extended organized, smooth.
+          Coarse: Extended disorganized, smooth.
+
+    - 04: Fine:   -
+          Medium: Extended organized, smooth.
+          Coarse: Extended disorganized, smooth.
+
+    - 05: Fine:   -
+          Medium: -
+          Coarse: Extended organized, smooth.
+
+    - 06: Fine:   -
+          Medium: -
+          Coarse: Round, smooth.
+
+Elm
+    - 01: [?]
+          Fine:   Flat, coarse.
+          Medium: Extended disorganized, coarse.
+          Coarse: Extended disorganized, bumpy.
+
+    - 02: Fine:   Flat, coarse.
+          Medium: -
+          Coarse: Round, bumpy.
+
+    - 03: Fine:   Flat, coarse.
+          Medium: Extended disorganized, coarse.
+          Coarse: Extended disorganized, bumpy.
+
+    - 04: Fine:   Flat, coarse.
+          Medium: Extended disorganized, coarse.
+          Coarse: Extended disorganized, bumpy.
+
+    - 05: Fine:   Flat, coarse.
+          Medium: -
+          Coarse: Extended disorganized, bumpy.
+
+    - 06: Fine:   Flat, coarse.
+          Medium: -
+          Coarse: Extended organized, bumpy.
+
+Feathers
+    - 01: [WATERMARK]
+          Fine:   -
+          Medium: Extended organized, smooth.
+          Coarse: Round, feathery.
+
+    - 02: Fine:   -
+          Medium: Extended organized, smooth.
+          Coarse: Round, feathery. 
+
+    - 03: Fine:   -
+          Medium: Extended organized, smooth.
+          Coarse: Round, feathery. 
+
+    - 04: Fine:   -
+          Medium: Extended organized, smooth.
+          Coarse: Extended disorganized, feathery.
+
+    - 05: [WATERMARK]
+          Fine:   Extended organized, smooth.
+          Medium: -
+          Coarse: Round, feathery.
+
+    - 06: Fine:   -
+          Medium: Flat, smooth.
+          Coarse: Round, feathery.
+
+Fur [?]
+    - 01: Fine:   -
+          Medium: -
+          Coarse: Extended disorganized, furry.
+
+    - 02: Fine:   -
+          Medium: -
+          Coarse: Extended disorganized, furry.
+
+    - 03: [?]
+          Fine:   -
+          Medium: Extended disorganized, furry.
+          Coarse: Round, furry.
+
+    - 04: Fine:   -
+          Medium: -
+          Coarse: Extended disorganized, furry.
+
+    - 05: Fine:   -
+          Medium: -
+          Coarse: Extended disorganized, furry.
+
+    - 06: Fine:   -
+          Medium: -
+          Coarse: Extended disorganized, furry.
+
+Hair [?]
+    - 01: [WATERMARK]
+          Fine:   -
+          Medium: -
+          Coarse: Extended disorganized, smooth.
+
+    - 02: [WATERMARK]
+          Fine:   -
+          Medium: -
+          Coarse: Extended disorganized, smooth.
+
+    - 03: Fine:   -
+          Medium: -
+          Coarse: Extended disorganized, smooth.
+
+    - 04: Fine:   -
+          Medium: -
+          Coarse: Extended disorganized, smooth.
+
+    - 05: Fine:   -
+          Medium: -
+          Coarse: Extended disorganized, smooth.
+
+    - 06: Fine:   -
+          Medium: -
+          Coarse: Extended disorganized, smooth.
+          
+KnitAran
+    - 01: Fine:   Extended organized, coarse.
+          Medium: -
+          Coarse: Extended organized, bumpy.
+
+    - 02: Fine:   Extended organized, coarse.
+          Medium: -
+          Coarse: Extended organized, bumpy.
+
+    - 03: [?]
+          Fine:   Extended organized, coarse.
+          Medium: -
+          Coarse: Extended organized, bumpy.
+
+    - 04: Fine:   Extended organized, coarse.
+          Medium: -
+          Coarse: Extended organized, bumpy.
+
+    - 05: Fine:   Extended organized, coarse.
+          Medium: Extended organized, bumpy.
+          Coarse: Round, bumpy.
+
+    - 06: Fine:   Extended organized, coarse.
+          Medium: Extended organized, bumpy.
+          Coarse: Round, bumpy.
+          
+KnitGuernsey [?]
+    - 01: Fine:   -
+          Medium: Extended organized, coarse.
+          Coarse: Extended organized, bumpy.
+
+    - 02: Fine:   -
+          Medium: Extended organized, coarse.
+          Coarse: Extended disorganized, coarse.
+
+    - 03: Fine:   Round, coarse.
+          Medium: -
+          Coarse: Extended disorganized, bumpy.
+
+    - 04: Fine:   Round, coarse.
+          Medium: -
+          Coarse: Extended organized, bumpy.
+
+    - 05: Fine:   Extended organized, coarse.
+          Medium: -
+          Coarse: Extended organized, bumpy.
+
+    - 06: Fine:   -
+          Medium: Extended disorganized, coarse.
+          Coarse: Extended organized, bumpy.
+          
+Leather
+    - 01: Fine:   Round, smooth.
+          Medium: -
+          Coarse: -
+
+    - 02: Fine:   Round, smooth.
+          Medium: -
+          Coarse: -
+
+    - 03: Fine:   Round, coarse.
+          Medium: -
+          Coarse: -
+
+    - 04: Fine:   Round, smooth.
+          Medium: -
+          Coarse: -
+
+    - 05: Fine:   Round, smooth.
+          Medium: -
+          Coarse: -
+
+    - 06: Fine:   Round, smooth.
+          Medium: -
+          Coarse: -
+          
+Marble [?]
+    - 01: Fine:   Flat, smooth.
+          Medium: -
+          Coarse: Extended disorganized, smooth.
+
+    - 02: Fine:   Flat, smooth.
+          Medium: -
+          Coarse: Extended disorganized, smooth.
+
+    - 03: Fine:   Flat, coarse.
+          Medium: -
+          Coarse: Extended disorganized, coarse.
+
+    - 04: Fine:   Flat, coarse.
+          Medium: -
+          Coarse: Extended disorganized, coarse.
+
+    - 05: Fine:   Flat, smooth.
+          Medium: -
+          Coarse: Extended disorganized, coarse.
+
+    - 06: Fine:   Flat, coarse.
+          Medium: -
+          Coarse: Extended disorganized, coarse.
+          
+Scale [?]
+    The fine scale represents a single scale.
+    - 01: Fine:   Flat, smooth. 
+          Medium: -
+          Coarse: Round, coarse.
+
+    - 02: Fine:   Flat, coarse.
+          Medium: - 
+          Coarse: Round, coarse.
+
+    - 03: Fine:   Flat, smooth.
+          Medium: -
+          Coarse: Round, coarse.
+
+    - 04: Fine:   Flat, smooth.
+          Medium: -
+          Coarse: Round, coarse.
+
+    - 05: Fine:   Flat, smooth.
+          Medium: -
+          Coarse: Round, coarse.
+
+    - 06: [WATERMARK]
+          Fine:   Flat, smooth.
+          Medium: -
+          Coarse: Round, coarse.
+          
+Silk
+    - 01: Fine:   -
+          Medium: Flat, smooth.
+          Coarse: Extended disorganized, bumpy.
+
+    - 02: Fine:   -
+          Medium: Flat, smooth.
+          Coarse: Extended disorganized, bumpy.
+
+    - 03: Fine:   -
+          Medium: Flat, smooth.
+          Coarse: Extended disorganized, bumpy.
+
+    - 04: Fine:   Extended organized, smooth.
+          Medium: Flat, smooth.
+          Coarse: Extended disorganized, bumpy.
+
+    - 05: Fine:   -
+          Medium: Flat, smooth.
+          Coarse: Extended disorganized, bumpy.
+
+    - 06: Fine:   -
+          Medium: Flat, smooth.
+          Coarse: Extended disorganized, bumpy.
+          
+Slate
+    - 01: Fine:   -
+          Medium: -
+          Coarse: Extended disorganized, coarse.
+
+    - 02: [?]
+          Fine:   -
+          Medium: -
+          Coarse: Extended organized, coarse.
+
+    - 03: Fine:   -
+          Medium: -
+          Coarse: Extended disorganized, coarse.
+
+    - 04: Fine:   -
+          Medium: -
+          Coarse: Extended disorganized, coarse.
+
+    - 05: Fine:   -
+          Medium: -
+          Coarse: Extended disorganized, coarse.
+
+    - 06: Fine:   -
+          Medium: -
+          Coarse: Extended disorganized, coarse.
+          
+Stucco
+    - 01: Fine:   Flat, smooth.
+          Medium: - 
+          Coarse: Round, coarse.
+
+    - 02: [WATERMARK]
+          Fine:   -
+          Medium: -
+          Coarse: Round, coarse.
+
+    - 03: Fine:   -
+          Medium: -
+          Coarse: Flat, coarse.
+
+    - 04: Fine:   -
+          Medium: -
+          Coarse: Round, coarse.
+
+    - 05: Fine:   Flat, coarse.
+          Medium: -
+          Coarse: Round, coarse.
+
+    - 06: Fine:   Flat, coarse.
+          Medium: -
+          Coarse: Round, coarse.
+          
+Velour
+    - 01: Fine:   -
+          Medium: -
+          Coarse: Flat, velvety
+
+    - 02: Fine:   -
+          Medium: Flat, velvety.
+          Coarse: Extended disorganized, bumpy.
+
+    - 03: Fine:   -
+          Medium: Flat, velvety.
+          Coarse: Extended disorganized, bumpy.
+
+    - 04: Fine:   -
+          Medium: Flat, velvety.
+          Coarse: Extended disorganized, bumpy.
+
+    - 05: Fine:   Extended disorganized, coarse.
+          Medium: -
+          Coarse: Flat, velvety.
+
+    - 06: Fine:   -
+          Medium: Flat, velvety.
+          Coarse: Extended organized, bumpy.
+          
+
+
+
+>> Doubts:
+
+ - What if there are more than one element in a surface, like the case of the birches, where some of them have these bark cracks apart from the horizontal patterns, and one of the them is organized and the other is disorganized?
+
+ Criteria followed: Consider them at different scale levels separately.
+
+
+ - [CORDUROY 02] Two extended organized patterns with perpendicular directions, is this, therefore, extended disorganized?
+
+ Criteria followed: Yes, at a coarse level. At a medium level, the pattern is organized.
+
+
+ - [CORDUROY 03] Does a wrinkle imply that a pattern is disorganized?
+
+ Criteria followed: Yes, at least, at a coarse level. At a medium level, the patterns can be considered without wrinkles.
+
+
+ - [ELM 01] Is this organized or disorganized?
+
+ Criteria followed: Disorganized.
+
+
+ - [ELM 06] Organized or disorganized?
+
+ Criteria followed: Organized.
+
+
+ - [FUR] Is the pattern of the fur considered organized or disorganized?
+
+ Criteria followed: Disorganized.
+
+
+ - [FUR 03] May the spots be considered as elements of round shape?
+
+ Criteria followed: Yes.
+
+
+ - [HAIR] What is the touch of the hair?
+
+ Criteria followed: Smooth.
+
+
+ - Is it sensible to make a distinction between rough (tree bark) and coarse (KnitAran)?
+
+ Criteria followed: Probably in the future.
+
+
+ - [KNITARAN 03] Can we consider some parts of the pattern as round and, then, also a new level of scale?
+
+ Criteria followed: No, they are extended disorganized.
+
+
+ - [KNITGUERNSEY] How to define the touch of a KnitGuernsey? Smooth, coarse or other?
+
+ Criteria followed: Coarse.
+
+
+ - [MARBLE] Do we have to use the patterns to define the shape of the lines, or just the shape of the surface?
+
+ Criteria followed: The patter of the lines too.
+
+
+ - [SCALE] What is the touch of a set of scales?
+
+ Criteria followed: Coarse.
+
+
+ - [SLATE 02] Can these lines be considered as organized?
+
+ Criteria followed: Yes.
+
+
+
+
+
+ >> Text shelf:
+
+ - [] ?
+
+ Criteria followed: 
+
+    - 07: Fine:
+          Medium:
+          Coarse:
+
+    - 08: Fine:
+          Medium:
+          Coarse:
+
+    - 09: Fine:
+          Medium:
+          Coarse:
+
+    - 10: Fine:
+          Medium:
+          Coarse:
+
+    - 11: Fine:
+          Medium:
+          Coarse:
+
+    - 12: Fine:
+          Medium:
+          Coarse:
