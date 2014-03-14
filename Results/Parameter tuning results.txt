@@ -1,0 +1,124 @@
+-- Results --
+
+Assigning properties to the images (half image training, half image test).
+In any case, the non-specified parameters are the default ones. Also, the histograms are not nornamlized.
+
+- SIFT, SDCA, One VS All, lambda 0.1, 200 clusters. 
+
+TRAINING SET:
+Mean accuracy: 87.80
+Min accuracy: 73.61
+Max accuracy: 99.54
+TEST SET:
+Mean accuracy: 78.63
+Min accuracy: 45.37
+Max accuracy: 99.54
+Elapsed time is 50.700414 seconds.
+
+- SIFT, SDCA, One VS All, lambda 0.1, 300 clusters. 
+
+TRAINING SET:
+Mean accuracy: 88.80
+Min accuracy: 59.26
+Max accuracy: 99.54
+TEST SET:
+Mean accuracy: 78.57
+Min accuracy: 27.31
+Max accuracy: 99.54
+Elapsed time is 54.040529 seconds.
+
+- SIFT, SGD, One VS All, lambda 0.1, 200 clusters. 
+
+TRAINING SET:
+Mean accuracy: 85.11
+Min accuracy: 66.20
+Max accuracy: 99.07
+TEST SET:
+Mean accuracy: 78.46
+Min accuracy: 43.06
+Max accuracy: 99.07
+Elapsed time is 48.293500 seconds.
+
+- SIFT, SGD, One VS All, lambda 0.1, 300 clusters. 
+
+TRAINING SET:
+Mean accuracy: 86.24
+Min accuracy: 54.17
+Max accuracy: 98.61
+TEST SET:
+Mean accuracy: 78.26
+Min accuracy: 27.31
+Max accuracy: 98.61
+Elapsed time is 52.602965 seconds.
+
+- SIFT, SDCA, One VS All, lambda 0.05, 200 clusters. 
+
+TRAINING SET:
+Mean accuracy: 89.32
+Min accuracy: 72.22
+Max accuracy: 99.54
+TEST SET:
+Mean accuracy: 80.57
+Min accuracy: 41.67
+Max accuracy: 99.54
+Elapsed time is 51.854285 seconds.
+
+- SIFT, SDCA, One VS All, lambda 0.01, 200 clusters. 
+
+TRAINING SET:
+Mean accuracy: 97.50
+Min accuracy: 80.56
+Max accuracy: 100.00
+TEST SET:
+Mean accuracy: 77.34
+Min accuracy: 45.37
+Max accuracy: 100.00
+Elapsed time is 53.950491 seconds.
+
+- SIFT, SDCA, One VS All, lambda 0.001, 200 clusters. 
+
+TRAINING SET:
+Mean accuracy: 99.88
+Min accuracy: 98.61
+Max accuracy: 100.00
+TEST SET:
+Mean accuracy: 76.28
+Min accuracy: 43.06
+Max accuracy: 100.00
+Elapsed time is 53.482810 seconds.
+
+- SIFT, SDCA, One VS All, lambda 0.02, 200 clusters. 
+
+TRAINING SET:
+Mean accuracy: 94.34
+Min accuracy: 84.72
+Max accuracy: 100.00
+TEST SET:
+Mean accuracy: 78.73
+Min accuracy: 44.91
+Max accuracy: 100.00
+Elapsed time is 54.778752 seconds.
+
+- SIFT, SDCA, One VS All, lambda 0.035, 200 clusters. 
+
+TRAINING SET:
+Mean accuracy: 92.16
+Min accuracy: 74.54
+Max accuracy: 99.54
+TEST SET:
+Mean accuracy: 77.49
+Min accuracy: 40.28
+Max accuracy: 99.54
+Elapsed time is 55.592278 seconds.
+
+- SIFT, SDCA, One VS All, lambda 0.075, 200 clusters. 
+
+TRAINING SET:
+Mean accuracy: 88.95
+Min accuracy: 69.44
+Max accuracy: 99.07
+TEST SET:
+Mean accuracy: 77.69
+Min accuracy: 40.28
+Max accuracy: 99.07
+Elapsed time is 52.576999 seconds.

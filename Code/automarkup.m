@@ -39,10 +39,13 @@ markup_file = '../Markups/Machine-Markup-(1.0).txt';
 feature_method = 'SIFT'; % PHOW, SIFT or DSIFT.
 
 % Number of clusters used in the K-means.
-num_clusters = 200; 
+num_clusters = 300; 
 
 % Support Vector Machine (SVM) solver.
-solver = 'SDCA';
+solver = 'SDCA'; % SGD or SDCA.
+
+% Lambda value of the SVM.
+lambda = 0.05;
 
 
 %%%%%%%%%%%%%%%%%%
@@ -74,8 +77,6 @@ num_file_names = length(file_names);
 features = permute(features, [2 1 3]);
 features = reshape(features, [num_materials*num_file_names, num_clusters])';
 
-%keyboard;
-
 % Cell array formed by cell arrays each with 4 elements: 
 % Scale string, feature string, SVM weight vector, SVM offset.
 num_properties = length(cell_properties);
@@ -98,7 +99,7 @@ for i = 1:num_properties,
     feature = scale_and_feature(1);
 
     % Build the classifier for this property.
-    [W,B,~,scores] = vl_svmtrain(features, labels, 0.1, 'Solver', solver);
+    [W,B,~,scores] = vl_svmtrain(features, labels, lambda, 'Solver', solver);
 
     % Store everything in the cell data structure.
     svms{i} = {scale, feature, W, B};
@@ -110,7 +111,7 @@ for i = 1:num_properties,
     max_accuracy = max(max_accuracy, accuracy);
 end
 
-% Print the resulting accuracies.
+% Print the resulting training accuracies.
 mean_accuracy = (mean_accuracy / num_properties);
 fprintf(1, 'TRAINING SET:\n');
 fprintf(1, 'Mean accuracy: %.2f\n', mean_accuracy * 100);
@@ -127,4 +128,37 @@ fprintf(1, 'Max accuracy: %.2f\n', max_accuracy * 100);
 % Quantize the feature descriptors using k-means.
 [features] = quantize_feature_vectors (descriptors, total_descriptors, num_clusters);
 
-keyboard;
+% Permute and reshape the features to classify all of them using matrix 
+% operations: one column per example.
+features = permute(features, [2 1 3]);
+features = reshape(features, [num_materials*num_file_names, num_clusters])';
+
+% Use one vs. all multiclass classification.
+for i = 1:num_properties,
+    % Get real labels of the images for this property.
+    labels = cell_properties{i}{2};
+
+    % Use the SVM linear classifiers to classify the test data.
+    % SVM cell structure: 'scale', 'feature', weight vector (W), bias (B).
+    W = svms{i}{3};
+    B = svms{i}{4};
+    scores = (W' * features) + B;
+
+    % Store everything in the cell data structure.
+    svms{i} = {scale, feature, W, B};
+
+    % Testing accuracy in the test set.
+    accuracy = sum(labels == sign(scores')) / length(labels);
+    mean_accuracy = mean_accuracy + accuracy;
+    min_accuracy = min(min_accuracy, accuracy);
+    max_accuracy = max(max_accuracy, accuracy);
+end
+
+% Print the resulting test accuracies.
+mean_accuracy = (mean_accuracy / num_properties);
+fprintf(1, 'TEST SET:\n');
+fprintf(1, 'Mean accuracy: %.2f\n', mean_accuracy * 100);
+fprintf(1, 'Min accuracy: %.2f\n', min_accuracy * 100);
+fprintf(1, 'Max accuracy: %.2f\n', max_accuracy * 100);
+
+%keyboard;
