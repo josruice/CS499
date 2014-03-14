@@ -1,0 +1,13 @@
+Library VLfeat.
+Use PHOW and svmtrain.
+Labels as 'scale + shape' or 'scale + touch'.
+
+Try with different k for the kmeans (200 as standard).
+Research for:
+    - Hierarchical kmeans.
+    - Binary histograms.
+    - Substituting histograms by TF/IDF.
+    - Histogram kernels.
+Adjust SVM parameters to avoid strange behaviour in VLFeat.
+Expect 60 - 70 % accuracy.
+Try with other images.

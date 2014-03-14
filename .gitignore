@@ -1,0 +1,6 @@
+# To reduce repo size.
+Papers/*
+
+# Mac stuff.
+.Trashes
+.DS_Store
