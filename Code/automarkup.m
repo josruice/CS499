@@ -10,11 +10,14 @@
 %
 % Algorithm outline:
 %   1. Get the features of the training images using a feature extraction method.
-%   2. Partition the descriptors in clusters using k-means (vector quantization).
-%   3. Define the image feature vector as an array with size the number of
-%      clusters where index i represents the number of image features whose
-%      nearest neighbour is cluster i.
-%   [...]
+%   2. Quantize the feature vectors:
+%       - Partition the feature descriptors in clusters using k-means.
+%       - Define the image feature vector as an array with size the number of
+%         clusters where index i represents the number of image features whose
+%         nearest neighbour is cluster i.
+%   3. Train one linear classifier per material property using Support Vector
+%      Machines (SVM) and the labels of the manual markup.
+%   [... In progress ...]
 %
 
 %%%%%%%%%%%%%%%%%%%%%
@@ -60,38 +63,8 @@ num_file_names = length(file_names);
 [descriptors, total_descriptors] = get_descriptors(root_path, materials, ...
     file_names, img_format, 'FIRST HALF', feature_method);
 
-% Convert the descriptors cell array into a standard 2D single matrix with the
-% descriptors in the columns.
-[d_matrix, num_descriptors] = descriptors_cell_to_single_matrix(descriptors, total_descriptors);
-
-% Build the clusters applying k-means clustering to the descriptors matrix.
-[clusters, assignment] = vl_kmeans(d_matrix, num_clusters);
-
-% Create a kd-tree with the clusters.
-kd_tree = vl_kdtreebuild(clusters);
-
-% Obtain the nearest neighbour (cluster center, in this case) of each column 
-% (descriptor) of the descriptors matrix. 
-[indices, dist] = vl_kdtreequery(kd_tree, clusters, d_matrix);
-% The output column vector indices contains the results sorted by material and
-% image, due to the way the input matrix have been built. 
-
-% Build the feature vectors of the images.
-features = zeros(num_materials, num_file_names, num_clusters, 'single');
-for i = 1:num_materials,
-    for j = 1:num_file_names,
-        % The closest neighbours of the feature descriptors are counted for
-        % each material image and the resulting array of size num clusters is
-        % the SVM feature vector.
-        feat_vector = accumarray(indices(1:num_descriptors{i,j})', 1);
-        features(i, j, 1:size(feat_vector,1)) = feat_vector;
-        % The indices vector can be chopped out in this way because the 
-        % materials and images are in order inside the vector.
-        indices = indices(num_descriptors{i,j}+1:end);
-    end
-end
-
-% TODO: normalize feature values.
+% Quantize the feature descriptors using k-means.
+[features] = quantize_feature_vectors (descriptors, total_descriptors, num_clusters);
 
 % Read markup data.
 [cell_properties] = read_markup(markup_file, num_materials, num_file_names);
@@ -132,22 +105,26 @@ for i = 1:num_properties,
 
     % Testing accuracy in the training set.
     accuracy = sum(labels == sign(scores')) / length(labels);
-
     mean_accuracy = mean_accuracy + accuracy;
     min_accuracy = min(min_accuracy, accuracy);
     max_accuracy = max(max_accuracy, accuracy);
 end
 
+% Print the resulting accuracies.
 mean_accuracy = (mean_accuracy / num_properties);
 fprintf(1, 'TRAINING SET:\n');
 fprintf(1, 'Mean accuracy: %.2f\n', mean_accuracy * 100);
 fprintf(1, 'Min accuracy: %.2f\n', min_accuracy * 100);
 fprintf(1, 'Max accuracy: %.2f\n', max_accuracy * 100);
 
+
 %%% TESTING %%%
 
-% Test the SVM over the other half of the images.
-%[descriptors, total_descriptors] = get_descriptors(root_path, materials, ...
-%    file_names, img_format, 'SECOND HALF', feature_method);
+% Get the descriptors of the first half of each image in this set of images.
+[descriptors, total_descriptors] = get_descriptors(root_path, materials, ...
+    file_names, img_format, 'SECOND HALF', feature_method);
 
-%keyboard;
+% Quantize the feature descriptors using k-means.
+[features] = quantize_feature_vectors (descriptors, total_descriptors, num_clusters);
+
+keyboard;
