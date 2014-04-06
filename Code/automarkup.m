@@ -67,19 +67,22 @@ num_file_names = length(file_names);
     file_names, img_format, 'FIRST HALF', feature_method);
 
 % Quantize the feature descriptors using k-means.
-[features] = quantize_feature_vectors (descriptors, total_descriptors, num_clusters);
+[features_3d] = quantize_feature_vectors (descriptors, total_descriptors, num_clusters);
 
-% Read markup data.
-[cell_properties] = read_markup(markup_file, num_materials, num_file_names);
+% Read markup data. The structure of the output cell array will be a column
+% vector of cell arrays with one row per different property, where each of the
+% elements store the name of the property (scale-property_name) and a column
+% vector with the images that have the property. 
+[cell_real_properties] = read_markup(markup_file, num_materials, num_file_names);
 
 % Permute and reshape the features to fit the Support Vector Machine (SVM)
 % requirements: one column per example.
-features = permute(features, [2 1 3]);
-features = reshape(features, [num_materials*num_file_names, num_clusters])';
+features_2d = permute(features_3d, [3 2 1]);
+features_2d = reshape(features_2d, [num_clusters, num_materials*num_file_names]);
 
 % Cell array formed by cell arrays each with 4 elements: 
-% Scale string, feature string, SVM weight vector, SVM offset.
-num_properties = length(cell_properties);
+% Scale string, feature string, SVM weight vector, SVM bias.
+num_properties = length(cell_real_properties);
 svms = cell(num_properties, 1);
 
 % Variables used to test the accuracy.
@@ -89,7 +92,7 @@ mean_accuracy = 0;
 
 % Use SVM to create the linear clasifiers for the properties.
 for i = 1:num_properties,
-    prop = cell_properties{i};
+    prop = cell_real_properties{i};
     prop_name = prop{1};
     labels = prop{2};
 
@@ -99,7 +102,7 @@ for i = 1:num_properties,
     feature = scale_and_feature(1);
 
     % Build the classifier for this property.
-    [W,B,~,scores] = vl_svmtrain(features, labels, lambda, 'Solver', solver);
+    [W,B,~,scores] = vl_svmtrain(features_2d, labels, lambda, 'Solver', solver);
 
     % Store everything in the cell data structure.
     svms{i} = {scale, feature, W, B};
@@ -126,26 +129,28 @@ fprintf(1, 'Max accuracy: %.2f\n', max_accuracy * 100);
     file_names, img_format, 'SECOND HALF', feature_method);
 
 % Quantize the feature descriptors using k-means.
-[features] = quantize_feature_vectors (descriptors, total_descriptors, num_clusters);
+[features_3d] = quantize_feature_vectors (descriptors, total_descriptors, num_clusters);
 
 % Permute and reshape the features to classify all of them using matrix 
 % operations: one column per example.
-features = permute(features, [2 1 3]);
-features = reshape(features, [num_materials*num_file_names, num_clusters])';
+features_2d = permute(features_3d, [3 2 1]);
+features_2d = reshape(features_2d, [num_clusters, num_materials*num_file_names]);
+
+% 3D matrix to store the binary property vector of the images. The rows
+% represent the materials, the columns the file names and the depth the 
+% properties.
+est_properties = zeros(num_materials, num_file_names, num_properties);
 
 % Use one vs. all multiclass classification.
 for i = 1:num_properties,
     % Get real labels of the images for this property.
-    labels = cell_properties{i}{2};
+    labels = cell_real_properties{i}{2};
 
     % Use the SVM linear classifiers to classify the test data.
     % SVM cell structure: 'scale', 'feature', weight vector (W), bias (B).
     W = svms{i}{3};
     B = svms{i}{4};
-    scores = (W' * features) + B;
-
-    % Store everything in the cell data structure.
-    svms{i} = {scale, feature, W, B};
+    scores = (W' * features_2d) + B;
 
     % Testing accuracy in the test set.
     accuracy = sum(labels == sign(scores')) / length(labels);
