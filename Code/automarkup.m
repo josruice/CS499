@@ -79,6 +79,7 @@ num_file_names = length(file_names);
 % requirements: one column per example.
 features_2d = permute(features_3d, [3 2 1]);
 features_2d = reshape(features_2d, [num_clusters, num_materials*num_file_names]);
+features_2d( find(features_2d) ) = 1; % Binary histograms.
 
 % Cell array formed by cell arrays each with 4 elements: 
 % Scale string, feature string, SVM weight vector, SVM bias.
@@ -117,9 +118,9 @@ end
 % Print the resulting training accuracies.
 mean_accuracy = (mean_accuracy / num_properties);
 fprintf(1, 'TRAINING SET:\n');
-fprintf(1, 'Mean accuracy: %.2f\n', mean_accuracy * 100);
-fprintf(1, 'Min accuracy: %.2f\n', min_accuracy * 100);
-fprintf(1, 'Max accuracy: %.2f\n', max_accuracy * 100);
+fprintf(1, ' - Mean accuracy: %.2f\n', mean_accuracy * 100);
+fprintf(1, ' - Min accuracy: %.2f\n', min_accuracy * 100);
+fprintf(1, ' - Max accuracy: %.2f\n\n', max_accuracy * 100);
 
 
 %%% TESTING %%%
@@ -135,8 +136,9 @@ fprintf(1, 'Max accuracy: %.2f\n', max_accuracy * 100);
 % operations: one column per example.
 features_2d = permute(features_3d, [3 2 1]);
 features_2d = reshape(features_2d, [num_clusters, num_materials*num_file_names]);
+features_2d( find(features_2d) ) = 1; % Binary histograms.
 
-% 3D matrix to store the binary property vector of the images. The rows
+% 3D matrix to store the binary properties vector of the images. The rows
 % represent the materials, the columns the file names and the depth the 
 % properties.
 est_properties = zeros(num_materials, num_file_names, num_properties);
@@ -162,8 +164,8 @@ end
 % Print the resulting test accuracies.
 mean_accuracy = (mean_accuracy / num_properties);
 fprintf(1, 'TEST SET:\n');
-fprintf(1, 'Mean accuracy: %.2f\n', mean_accuracy * 100);
-fprintf(1, 'Min accuracy: %.2f\n', min_accuracy * 100);
-fprintf(1, 'Max accuracy: %.2f\n', max_accuracy * 100);
+fprintf(1, ' - Mean accuracy: %.2f\n', mean_accuracy * 100);
+fprintf(1, ' - Min accuracy: %.2f\n', min_accuracy * 100);
+fprintf(1, ' - Max accuracy: %.2f\n\n', max_accuracy * 100);
 
 %keyboard;
