@@ -230,50 +230,32 @@ num_images_share = length(find(same_prop_matrix));
 fprintf(1, '\n');
 fprintf(1, 'Number of images that share their vector of properties with images from other classes: %d of a total of %d images (%.2f%%).\n', num_images_share, num_images, num_images_share*100/num_images);
 fprintf(1, 'Number of images that don''t share their vector of properties with images from other classes: %d of a total of %d images (%.2f%%).\n', num_images-num_images_share, num_images, 100-(num_images_share*100/num_images));
-
-
-%  - Get the materials that share the properties vector the most.
-max_shared_material_times = max(sum(same_prop_matrix'));
-max_shared_material_names = materials(find(sum(same_prop_matrix') == max_shared_material_times));
-fprintf(1, 'The material(s) that share(s) the properties vector of their images the most: \n')
-disp(sort(max_shared_material_names)')
-fprintf(1, 'with a total of %d times.\n', max_shared_material_times);
 fprintf(1, '\n');
 
-%  - Get the materials that share the properties vector the less.
-min_shared_material_times = min(sum(same_prop_matrix'));
-min_shared_material_names = materials(find(sum(same_prop_matrix') == min_shared_material_times));
-fprintf(1, 'The material(s) that share(s) the properties vector of their images the less: \n')
-disp(sort(min_shared_material_names)')
-fprintf(1, 'with a total of %d times.\n', min_shared_material_times);
-fprintf(1, '\n');
+
+%  - Get the ranking of the materials by number of vectors of properties shared.
+fprintf(1, 'Ranking of the materials by number of vectors of properties shared:\n')
+vector = sum(same_prop_matrix');
+[X, order] = sort(vector(:), 1, 'descend');
+disp(strcat(num2str(X), ' -', {' '}, materials(order)'));
 
 %  - Get the average times that a material share their properties vector.
 avg_shared_material_times = mean(sum(same_prop_matrix'));
 fprintf(1, 'The average times that a material share their properties vector is %.2f.\n', avg_shared_material_times)
 fprintf(1, '\n');
 
-%  - Get the images that share the vector of properties the most.
-max_shared_image_times = max(same_prop_matrix(:));
-[I,J] = ind2sub([num_materials, num_file_names], find(same_prop_matrix == max(same_prop_matrix(:))));
-max_shared_image_names = strcat(materials(I), '-', file_names(J));
-fprintf(1, 'The image(s) that share(s) the properties vector the most: \n')
-disp(sort(max_shared_image_names)');
-fprintf(1, 'with a total of %d times.\n', max_shared_image_times);
-fprintf(1, '\n');
-
-%  - Get the images that share the vector of properties the less.
-min_shared_image_times = min(same_prop_matrix(:));
-[I,J] = ind2sub([num_materials, num_file_names], find(same_prop_matrix == min(same_prop_matrix(:))));
-min_shared_image_names = strcat(materials(I), '-', file_names(J));
-fprintf(1, 'The image(s) that share(s) the properties vector the less: \n')
-disp(sort(min_shared_image_names)');
-fprintf(1, 'with a total of %d times.\n', min_shared_image_times);
-fprintf(1, '\n');
+%  - Get the ranking of the images by the number of times its vector of properties 
+%    is shared.
+fprintf(1, 'Ranking of the images by the number of times its vector of properties is shared:\n')
+matrix = same_prop_matrix';
+[X,order] = sort(matrix(:), 1, 'descend');
+[J,I] = ind2sub(size(matrix), order);
+disp(strcat(num2str(X), ' -', {' '}, materials(I)', {' '}, file_names(J)'));
 
 %  - Get the average times that an image shares its properties vector.
 avg_shared_image_times = mean(same_prop_matrix(:));
 fprintf(1, 'The average times that an image shares its properties vector is %.2f.\n', avg_shared_image_times)
 fprintf(1, '\n');
+
 
 keyboard;
