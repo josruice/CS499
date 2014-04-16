@@ -49,6 +49,9 @@ solver = 'SDCA'; % SGD or SDCA.
 % Lambda value of the SVM.
 lambda = 0.05;
 
+% Verbose level.
+verbose = 0;
+
 
 %%%%%%%%%%%%%%%%%%
 %%%   Script   %%%
@@ -62,7 +65,8 @@ num_materials = length(materials);
 num_file_names = length(file_names);
 num_images = num_materials * num_file_names;
 
-%%% TRAINING %%%
+
+%%% TRAINING  SVMs %%%
 
 % Get the descriptors of the first half of each image in this set of images.
 [descriptors, total_descriptors] = get_descriptors(root_path, materials, ...
@@ -122,15 +126,17 @@ for i = 1:num_properties,
     max_accuracy = max(max_accuracy, accuracy);
 end
 
-% Print the resulting training accuracies.
-mean_accuracy = (mean_accuracy / num_properties);
-fprintf(1, 'TRAINING SET:\n');
-fprintf(1, ' - Mean accuracy: %.2f\n', mean_accuracy * 100);
-fprintf(1, ' - Min accuracy: %.2f\n', min_accuracy * 100);
-fprintf(1, ' - Max accuracy: %.2f\n\n', max_accuracy * 100);
+if verbose >= 1
+    % Print the resulting training accuracies.
+    mean_accuracy = (mean_accuracy / num_properties);
+    fprintf(1, 'TRAINING SET:\n');
+    fprintf(1, ' - Mean accuracy: %.2f\n', mean_accuracy * 100);
+    fprintf(1, ' - Min accuracy: %.2f\n', min_accuracy * 100);
+    fprintf(1, ' - Max accuracy: %.2f\n\n', max_accuracy * 100);
+end
 
 
-%%% TESTING %%%
+%%% TESTING SMVs %%%
 
 % Get the descriptors of the first half of each image in this set of images.
 [descriptors, total_descriptors] = get_descriptors(root_path, materials, ...
@@ -145,15 +151,16 @@ features_2d = permute(features_3d, [3 2 1]);
 features_2d = reshape(features_2d, [num_clusters, num_materials*num_file_names]);
 features_2d( find(features_2d) ) = 1; % Binary histograms.
 
-% 3D matrix to store the binary properties vector of the images. The rows
+% 3D matrices to store the binary properties vectors of the images. The rows
 % represent the materials, the columns the file names and the depth the 
 % properties with value 0 (not present) or 1 (present).
 est_properties = zeros(num_materials, num_file_names, num_properties);
+real_properties = zeros(num_materials, num_file_names, num_properties);
 
 % Use one vs. all multiclass classification.
 for i = 1:num_properties,
     % Get real labels of the images for this property.
-    labels = cell_real_properties{i}{2};
+    real_labels = cell_real_properties{i}{2}';
 
     % Use the SVM linear classifiers to classify the test data.
     % SVM cell structure: 'scale', 'feature', weight vector (W), bias (B).
@@ -164,31 +171,72 @@ for i = 1:num_properties,
     % Elements with score 0 (on the line of the linear classifier) are
     % the same as negative (don't have the property).
     estimated_labels = sign(scores); % Returns -1, 0 or 1, depending on sign.
-    estimated_labels( find(estimated_labels == 0) ) = -1;
+    estimated_labels( find(estimated_labels == -1) ) = 0;
+    real_labels( find(real_labels == -1) ) = 0;
 
-    % Store the estimated properties of each image using -1 and 1.
+    % Store the estimated and real properties of each image using binary vectors.
     est_properties(:,:,i) = reshape(estimated_labels, [num_file_names, num_materials])'; 
+    real_properties(:,:,i) = reshape(real_labels, [num_file_names, num_materials])';
 
     % Testing accuracy in the test set.
-    accuracy = sum(labels == sign(estimated_labels')) / length(labels);
+    accuracy = sum(real_labels == sign(estimated_labels)) / length(real_labels);
     mean_accuracy = mean_accuracy + accuracy;
     min_accuracy = min(min_accuracy, accuracy);
     max_accuracy = max(max_accuracy, accuracy);
 end
 
-% Print the resulting test accuracies.
-mean_accuracy = (mean_accuracy / num_properties);
-fprintf(1, 'TEST SET:\n');
-fprintf(1, ' - Mean accuracy: %.2f\n', mean_accuracy * 100);
-fprintf(1, ' - Min accuracy: %.2f\n', min_accuracy * 100);
-fprintf(1, ' - Max accuracy: %.2f\n\n', max_accuracy * 100);
+if verbose >= 1
+    % Print the resulting test accuracies.
+    mean_accuracy = (mean_accuracy / num_properties);
+    fprintf(1, 'TEST SET:\n');
+    fprintf(1, ' - Mean accuracy: %.2f\n', mean_accuracy * 100);
+    fprintf(1, ' - Min accuracy: %.2f\n', min_accuracy * 100);
+    fprintf(1, ' - Max accuracy: %.2f\n\n', max_accuracy * 100);
+end
 
-% Convert the estimated properties vectors to binary (-1 -> 0 and 1 -> 1).
-est_properties( find(est_properties == -1) ) = 0;
+if verbose >= 1
+    % Print some statistics about the current estimated properties.
+    print_estimated_properties_stats (materials, file_names, num_properties, num_properties_per_image, est_properties);
+end
 
-keyboard;
 
-% Print some statistics about the current estimated properties.
-print_estimated_properties_stats (materials, file_names, num_properties, num_properties_per_image, est_properties);
+%%% Naive Bayes %%%
 
-keyboard;
+%% Predicted data.
+
+% Permute and reshape the class labels and the estimated properties vectors to 
+% fit the Naive Bayes fitting function requirements.
+material_labels = repmat(materials, 12, 1);
+est_properties = permute(est_properties, [3 2 1]);
+est_properties = reshape(est_properties, [num_properties, num_file_names*num_materials]);
+
+% Train the Naive Bayes classifier with the predicted data.
+est_bayes = NaiveBayes.fit(est_properties', material_labels(:), 'Distribution', 'mn');
+
+% Check the accuracy of the results.
+indices_well_classified = cellfun(@strcmp, est_bayes.predict(est_properties'), material_labels(:));
+num_correctly_classified = sum(indices_well_classified);
+
+fprintf(1, 'Naive Bayes with predicted data:\n')
+fprintf(1, ' - Correctly classified: %d (%.2f %%)\n', num_correctly_classified, num_correctly_classified*100/num_images);
+fprintf(1, ' - NOT-correctly classified: %d (%.2f %%)\n', num_images-num_correctly_classified, 100-(num_correctly_classified*100/num_images));
+
+
+%% Ground truth data.
+
+% Permute and reshape the real properties vectors to fit the Naive Bayes fitting
+% function requirements.
+real_properties = permute(real_properties, [3 2 1]);
+real_properties = reshape(real_properties, [num_properties, num_file_names*num_materials]);
+
+% Train the Naive Bayes classifier with the predicted data.
+real_bayes = NaiveBayes.fit(real_properties', material_labels(:), 'Distribution', 'mn');
+
+% Check the accuracy of the results.
+indices_well_classified = cellfun(@strcmp, real_bayes.predict(real_properties'), material_labels(:));
+num_correctly_classified = sum(indices_well_classified);
+
+fprintf(1, 'Naive Bayes with ground truth data:\n')
+fprintf(1, ' - Correctly classified: %d (%.2f %%)\n', num_correctly_classified, num_correctly_classified*100/num_images);
+fprintf(1, ' - NOT-correctly classified: %d (%.2f %%)\n', num_images-num_correctly_classified, 100-(num_correctly_classified*100/num_images));
+
