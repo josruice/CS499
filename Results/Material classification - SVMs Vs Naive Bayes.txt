@@ -1,0 +1,105 @@
+
+
+TRAINING SET:
+ - Mean accuracy: 87.11
+ - Min accuracy: 40.28
+ - Max accuracy: 99.07
+
+TEST SET:
+ - Mean accuracy: 74.93
+ - Min accuracy: 22.22
+ - Max accuracy: 98.61
+
+Naive Bayes with predicted data:
+ - Correctly classified: 57 (26.39 %)
+ - NOT-correctly classified: 159 (73.61 %)
+Naive Bayes with ground truth data:
+ - Correctly classified: 183 (84.72 %)
+ - NOT-correctly classified: 33 (15.28 %)
+
+SVMs with predicted data:
+ - Correctly classified: 203 (94.42 %)
+ - NOT-correctly classified: 13 (5.58 %)
+SVMs with real data:
+ - Correctly classified: 210 (97.40 %)
+ - NOT-correctly classified: 6 (2.60 %)
+
+SVMs with one vs. all and estimated data:
+ - Correctly classified: 33 (15.28 %)
+ - NOT-correctly classified: 183 (84.72 %)
+SVMs with one vs. all and ground truth data:
+ - Correctly classified: 166 (76.85 %)
+ - NOT-correctly classified: 50 (23.15 %)
+
+Elapsed time is 53.965556 seconds.
+
+__________________________________________________
+
+
+TRAINING SET:
+ - Mean accuracy: 88.60
+ - Min accuracy: 54.63
+ - Max accuracy: 99.54
+
+TEST SET:
+ - Mean accuracy: 77.17
+ - Min accuracy: 42.59
+ - Max accuracy: 98.61
+
+Naive Bayes with predicted data:
+ - Correctly classified: 63 (29.17 %)
+ - NOT-correctly classified: 153 (70.83 %)
+Naive Bayes with ground truth data:
+ - Correctly classified: 183 (84.72 %)
+ - NOT-correctly classified: 33 (15.28 %)
+
+SVMs with predicted data:
+ - Correctly classified: 204 (94.44 %)
+ - NOT-correctly classified: 13 (5.56 %)
+SVMs with real data:
+ - Correctly classified: 209 (97.09 %)
+ - NOT-correctly classified: 7 (2.91 %)
+
+SVMs with one vs. all and predicted data:
+ - Correctly classified: 29 (13.43 %)
+ - NOT-correctly classified: 187 (86.57 %)
+SVMs with one vs. all and ground truth data:
+ - Correctly classified: 157 (72.69 %)
+ - NOT-correctly classified: 59 (27.31 %)
+
+__________________________________________________
+
+
+TRAINING SET:
+ - Mean accuracy: 89.25
+ - Min accuracy: 66.67
+ - Max accuracy: 99.07
+
+TEST SET:
+ - Mean accuracy: 78.31
+ - Min accuracy: 37.96
+ - Max accuracy: 98.61
+
+Naive Bayes with predicted data:
+ - Correctly classified: 69 (31.94 %)
+ - NOT-correctly classified: 147 (68.06 %)
+Naive Bayes with ground truth data:
+ - Correctly classified: 183 (84.72 %)
+ - NOT-correctly classified: 33 (15.28 %)
+
+SVMs with predicted data:
+ - Correctly classified: 204 (94.44 %)
+ - NOT-correctly classified: 13 (5.56 %)
+SVMs with real data:
+ - Correctly classified: 211 (97.69 %)
+ - NOT-correctly classified: 5 (2.31 %)
+
+SVMs with one vs. all and predicted data:
+ - Correctly classified: 38 (17.59 %)
+ - NOT-correctly classified: 178 (82.41 %)
+SVMs with one vs. all and ground truth data:
+ - Correctly classified: 180 (83.33 %)
+ - NOT-correctly classified: 36 (16.67 %)
+
+Elapsed time is 53.254655 seconds.
+
