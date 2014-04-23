@@ -3,12 +3,12 @@
 function [features, clusters, num_clusters] = quantize_feature_vectors (descriptors_in, total_descriptors_in, num_clusters_in, varargin)
 
     % Initialize constants.
-    uint8_datatype = 'uint8';
-    single_datatype = 'single';
+    UINT8_DATATYPE = 'uint8';
+    SINGLE_DATATYPE = 'single';
 
-    default_datatype = uint8_datatype;
-    default_hierarchical = false;
-    default_branching_factor = 100;
+    DEFAULT_DATATYPE = UINT8_DATATYPE;
+    DEFAULT_HIERARCHICAL = false;
+    DEFAULT_BRANCHING_FACTOR = 100;
 
     % Create arguments parser.
     parser = inputParser;
@@ -18,9 +18,9 @@ function [features, clusters, num_clusters] = quantize_feature_vectors (descript
     parser.addRequired('TotalDescriptors', @(x) (x)>1);
     parser.addRequired('NumClusters', @(x) (x)>0);
 
-    parser.addParamValue('Datatype', default_datatype, @isstr);
-    parser.addParamValue('Hierarchical', default_hierarchical, @islogical);
-    parser.addParamValue('BranchingFactor', default_branching_factor, @(x) (x)>1);
+    parser.addParamValue('Datatype', DEFAULT_DATATYPE, @isstr);
+    parser.addParamValue('Hierarchical', DEFAULT_HIERARCHICAL, @islogical);
+    parser.addParamValue('BranchingFactor', DEFAULT_BRANCHING_FACTOR, @(x) (x)>1);
 
     % Parse input arguments.
     parser.parse(descriptors_in, total_descriptors_in, num_clusters_in, varargin{:});
@@ -44,7 +44,7 @@ function [features, clusters, num_clusters] = quantize_feature_vectors (descript
 
     % Build the clusters applying k-means clustering to the descriptors matrix
     % and obtain the center associated with each descriptor.
-    if strcmp(datatype, uint8_datatype)
+    if strcmp(datatype, UINT8_DATATYPE)
         d_matrix = uint8(d_matrix); % Convert the matrix datatype to uint8.
 
         if hierarchical
@@ -61,7 +61,7 @@ function [features, clusters, num_clusters] = quantize_feature_vectors (descript
             [clusters, indices] = vl_ikmeans(d_matrix, num_clusters);
         end
     else
-        if not( strcmp(datatype, single_datatype) )
+        if not( strcmp(datatype, SINGLE_DATATYPE) )
             fprintf(1, 'Wrong parameters. Default execution.\n');
         end
 
