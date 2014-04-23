@@ -24,7 +24,10 @@
 %%%   Constants   %%%
 %%%%%%%%%%%%%%%%%%%%%
 
-% Data.
+%%% General.
+verbose = 1; % Verbose level.
+
+%%% Data.
 root_path = '../Dataset'; % Without last slash.
 
 materials = {'Birch', 'Brick', 'Concrete', 'Corduroy', 'Denim', 'Elm', 'Feathers', 'Fur', 'Hair', 'KnitAran', 'KnitGuernsey', 'Leather', 'Marble', 'Scale', 'Silk', 'Slate', 'Stucco', 'Velour'};
@@ -37,21 +40,24 @@ markup_file = '../Markups/Machine-Markup-(1.0).txt';
 
 num_properties_per_image = 6;
 
-% Classifiers.
+%%% Descriptors.
 feature_method = 'SIFT'; % PHOW, SIFT or DSIFT.
 
-% Number of clusters used in the K-means.
-num_clusters = 300; 
+%%% K-means
+num_clusters = 100;     % Min number of clusters obtained.
+datatype = 'uint8';     % Datatype of the descriptors matrix: single or uint8.
+hierarchical = true;    % Hierarchical (only with uint8).
+branching_factor = 10;  % Branching factor (only with hierarchical.
 
-% Support Vector Machine (SVM) solver.
-solver = 'SDCA'; % SGD or SDCA.
+%%% Suppor Vector Machines.
+solver = 'SDCA';    % Solver method: SGD or SDCA.
+lambda = 0.05;      % Lambda value of the SVM.
 
-% Lambda value of the SVM.
-lambda = 0.05;
-
-% Verbose level.
-verbose = 1;
-
+%%% Others (do NOT change).
+% Function parameters names.
+datatype_param = 'Datatype';
+hierarchical_param = 'Hierarchical';
+branching_param = 'Branching';
 
 %%%%%%%%%%%%%%%%%%
 %%%   Script   %%%
@@ -73,7 +79,13 @@ num_images = num_materials * num_file_names;
     file_names, img_format, 'FIRST HALF', feature_method);
 
 % Quantize the feature descriptors using k-means.
-[features_3d] = quantize_feature_vectors (descriptors, total_descriptors, num_clusters);
+keyboard;
+[features_3d, clusters, num_clusters] = quantize_feature_vectors (  ...
+    descriptors, total_descriptors, num_clusters,                   ...
+    datatype_param,     datatype,                                   ...
+    hierarchical_param, hierarchical,                               ...
+    branching_param,    branching_factor);
+keyboard;
 
 % Read markup data. The structure of the output cell array will be a column
 % vector of cell arrays with one row per different property, where each of the
@@ -143,7 +155,7 @@ end
     file_names, img_format, 'SECOND HALF', feature_method);
 
 % Quantize the feature descriptors using k-means.
-[features_3d] = quantize_feature_vectors (descriptors, total_descriptors, num_clusters);
+[features_3d, ] = quantize_feature_vectors (descriptors, total_descriptors, num_clusters);
 
 % Permute and reshape the features to classify all of them using matrix 
 % operations: one column per example.

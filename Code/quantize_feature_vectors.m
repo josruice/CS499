@@ -1,24 +1,76 @@
 % TODO: Write proper documentation.
 
-function [features] = quantize_feature_vectors (descriptors, total_descriptors, num_clusters)
+function [features, clusters, num_clusters] = quantize_feature_vectors (descriptors_in, total_descriptors_in, num_clusters_in, varargin)
+
+    % Initialize constants.
+    uint8_datatype = 'uint8';
+    single_datatype = 'single';
+
+    default_datatype = uint8_datatype;
+    default_hierarchical = false;
+    default_branching_factor = 100;
+
+    % Create arguments parser.
+    parser = inputParser;
+
+    % Add required and parametrized arguments.
+    parser.addRequired('Descriptors', @(x) length(x)>1);
+    parser.addRequired('TotalDescriptors', @(x) (x)>1);
+    parser.addRequired('NumClusters', @(x) (x)>0);
+
+    parser.addParamValue('Datatype', default_datatype, @isstr);
+    parser.addParamValue('Hierarchical', default_hierarchical, @islogical);
+    parser.addParamValue('BranchingFactor', default_branching_factor, @(x) (x)>1);
+
+    % Parse input arguments.
+    parser.parse(descriptors_in, total_descriptors_in, num_clusters_in, varargin{:});
+
+    % Read the arguments.
+    inputs = parser.Results;
+    descriptors = inputs.Descriptors;
+    total_descriptors = inputs.TotalDescriptors;
+    num_clusters = inputs.NumClusters;
+
+    datatype = inputs.Datatype;
+    hierarchical = inputs.Hierarchical;
+    branching_factor = inputs.BranchingFactor;
+
     % Get the size of the descriptors cell.
     [num_rows num_columns] = size(descriptors);
 
-    % Convert the descriptors cell array into a standard 2D single matrix with the
+    % Convert the descriptors cell array into a standard 2D matrix with the
     % descriptors in the columns.
-    [d_matrix, num_descriptors] = descriptors_cell_to_single_matrix(descriptors, total_descriptors);
+    [d_matrix, num_descriptors] = descriptors_cell_to_matrix(descriptors, total_descriptors);
 
-    % Build the clusters applying k-means clustering to the descriptors matrix.
-    [clusters, ~] = vl_kmeans(d_matrix, num_clusters);
+    % Build the clusters applying k-means clustering to the descriptors matrix
+    % and obtain the center associated with each descriptor.
+    if strcmp(datatype, uint8_datatype)
+        d_matrix = uint8(d_matrix); % Convert the matrix datatype to uint8.
 
-    % Create a kd-tree with the clusters.
-    kd_tree = vl_kdtreebuild(clusters);
+        if hierarchical
+            [clusters, asgn] = vl_hikmeans(d_matrix, branching_factor, num_clusters);
+            
+            % Cover the assignments tree to convert it into a list.
+            num_clusters = branching_factor;
+            for i = 2:size(asgn,1),
+                asgn(i,:) = ( asgn(i-1,:)-1 )*branching_factor + asgn(i,:);
+                num_clusters = num_clusters * branching_factor;
+            end
+            indices = asgn(end,:);
+        else
+            [clusters, indices] = vl_ikmeans(d_matrix, num_clusters);
+        end
+    else
+        if not( strcmp(datatype, single_datatype) )
+            fprintf(1, 'Wrong parameters. Default execution.\n');
+        end
 
-    % Obtain the nearest neighbour (cluster center, in this case) of each column 
-    % (descriptor) of the descriptors matrix. 
-    [indices, dist] = vl_kdtreequery(kd_tree, clusters, d_matrix);
-    % The output column vector indices contains the results sorted by folder and
-    % image, due to the way the input matrix have been built. 
+        d_matrix = single(d_matrix); % Convert the matrix datatype to single.
+
+        [clusters, indices] = vl_kmeans(d_matrix, num_clusters);  
+    end
+    % The output column vector indices contains the results sorted by folder 
+    % and image, due to the way the input matrix have been built.       
 
     % Build the feature vectors of the images ans store the result in a 3D matrix
     % where the rows and columns are the images in the same positions as the 

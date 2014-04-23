@@ -1,10 +1,10 @@
 % TODO: Write proper documentation.
 
-function [matrix, num_descriptors] = descriptors_cell_to_single_matrix(descriptors, total_descriptors)
+function [matrix, num_descriptors] = descriptors_cell_to_matrix(descriptors, total_descriptors)
 
     % Create the matrix where the descriptors will be stored by columns.
     num_rows = size(descriptors{1,1}, 1);
-    matrix = zeros(num_rows, total_descriptors, 'single');
+    matrix = zeros(num_rows, total_descriptors);
 
     % Get the size of the descriptors cell.
     [num_rows num_columns] = size(descriptors);
