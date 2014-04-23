@@ -1,6 +1,6 @@
 % TODO: Write proper documentation.
 
-function [cell_properties] = read_markup(file_path, num_materials, num_file_names)
+function [cell_properties, matrix_properties, num_properties] = read_markup(file_path, num_materials, num_file_names)
     % Open the file with reading permissions and create a file descriptor.
     file = fopen(file_path);
 
@@ -62,21 +62,27 @@ function [cell_properties] = read_markup(file_path, num_materials, num_file_name
     % It is time to create the labels vector. All the data will be stored in a
     % cell matrix where each slot will contain the property name and the labels
     % vector.
+    keys = map.keys();
     num_properties = length(map);
     cell_properties = cell(num_properties,1);
-    keys = map.keys();
+    
+    % At the same time, a 3D matrix with the same number of rows and columns as
+    % materials and file names, respectively, will be filled with the vector of
+    % properties of the image in that position.
+    matrix_properties = zeros(num_materials, num_file_names, num_properties);
     for i = 1:num_properties,
         % Property name.
         name = keys{i};
 
         % Property labels. 
-        %  - First all the labels are set to -1.
-        labels = -ones(num_materials*num_file_names, 1);
+        %  - First all the labels are set to 0.
+        labels = zeros(num_materials*num_file_names, 1);
 
         %  - Then, those material images that have this property are set to 1.
         labels( map(name) ) = 1;
 
         % Store the data of this property.
         cell_properties{i} = {name, labels};
+        matrix_properties(:,:,i) = reshape(labels, [num_file_names, num_materials])'; 
     end
 end
