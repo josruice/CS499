@@ -1,0 +1,95 @@
+VLfeat k-means method comparison:
+
+ - Integer kmeans with Elkan and 300 clusters: 
+    Elapsed time is 205.391702 seconds.
+
+ - Integer kmeans with Lloyd and 300 clusters: 
+    Elapsed time is 199.376723 seconds.
+
+ - Single precision kmeans with Lloyd and 300 clusters:
+    Elapsed time is 8.335739 seconds.
+
+ - Single precision kmeans with Elkan and 300 clusters:
+    Elapsed time is 7.734047 seconds.
+
+ - Single precision kmeans with Ann and 300 clusters:
+    Elapsed time is 15.223003 seconds.
+
+ - Hierarchichal kmeans with 100 initial clusters and 100 leaves:
+    Elapsed time is 85.174283 seconds.
+
+ - Hierarchichal kmeans with 100 initial clusters and 10000 leaves:
+    Elapsed time is 100.480863 seconds.
+    Elapsed time is 105.814615 seconds.
+    Elapsed time is 83.670700 seconds.
+
+The results are very different.
+
+
+d2_matrix = d_matrix(:, randperm(total_descriptors, 1e6));
+
+
+
+
+
+d2_matrix = d_matrix(:, randperm(total_descriptors, 5000));
+K>> tic; [clusters, indices] = vl_ikmeans(d2_matrix, num_clusters); toc;
+Elapsed time is 1.754479 seconds.
+K>> d2_matrix = d_matrix(:, randperm(total_descriptors, 50000));
+K>> tic; [clusters, indices] = vl_ikmeans(d2_matrix, num_clusters); toc;
+Elapsed time is 72.352142 seconds.
+K>> d2_matrix = d_matrix(:, randperm(total_descriptors, 55000));
+K>> tic; [clusters, indices] = vl_ikmeans(d2_matrix, num_clusters); toc;
+Elapsed time is 122.222438 seconds.
+K>> d2_matrix = d_matrix(:, randperm(total_descriptors, 50000));
+K>> tic; [clusters, indices] = vl_ikmeans(d2_matrix, 10); toc;
+Elapsed time is 7.855867 seconds.
+K>> tic; [clusters, indices] = vl_ikmeans(d2_matrix, 50); toc;
+Elapsed time is 42.036557 seconds.
+K>> tic; [clusters, indices] = vl_ikmeans(d2_matrix, 500); toc;
+Elapsed time is 198.833171 seconds.
+K>> d2_matrix = d_matrix(:, randperm(total_descriptors, 100000));
+K>> tic; [clusters, indices] = vl_ikmeans(d2_matrix, 10); toc;
+Elapsed time is 9.793511 seconds.
+K>> d2_matrix = d_matrix(:, randperm(total_descriptors, 200000));
+K>> tic; [clusters, indices] = vl_ikmeans(d2_matrix, 10); toc;
+Elapsed time is 31.746212 seconds.
+K>> tic; [clusters, indices] = vl_ikmeans(d2_matrix, 5); toc;
+Elapsed time is 7.006786 seconds.
+K>> d2_matrix = d_matrix(:, randperm(total_descriptors, 500000));
+K>> tic; [clusters, indices] = vl_ikmeans(d2_matrix, 5); toc;
+Elapsed time is 8.933509 seconds.
+K>> d2_matrix = d_matrix(:, randperm(total_descriptors, 1000000));
+K>> tic; [clusters, indices] = vl_ikmeans(d2_matrix, 5); toc;
+Elapsed time is 20.901949 seconds.
+K>> tic; [clusters, indices] = vl_ikmeans(d2_matrix, 3); toc;
+Elapsed time is 16.219018 seconds.
+K>> d2_matrix = d_matrix(:, randperm(total_descriptors, 2000000));
+K>> tic; [clusters, indices] = vl_ikmeans(d2_matrix, 3); toc;
+Elapsed time is 77.241440 seconds.
+K>> tic; [clusters, indices] = vl_ikmeans(d2_matrix, 2); toc;
+Elapsed time is 21.437742 seconds.
+K>> d2_matrix = d_matrix(:, randperm(total_descriptors, 4000000));
+K>> tic; [clusters, indices] = vl_ikmeans(d2_matrix, 2); toc;
+Elapsed time is 37.147313 seconds.
+K>> d2_matrix = d_matrix(:, randperm(total_descriptors, 8000000));
+K>> tic; [clusters, indices] = vl_ikmeans(d2_matrix, 2); toc;
+Elapsed time is 103.650449 seconds.
+K>> tic; [clusters, indices] = vl_ikmeans(d_matrix, 2); toc;
+Elapsed time is 94.448881 seconds.
+K>> tic; [clusters, indices] = vl_ikmeans(d_matrix, 2); toc;
+Elapsed time is 98.920678 seconds.
+K>> tic; [clusters, indices] = vl_ikmeans(d_matrix, 3); toc;
+Elapsed time is 635.847989 seconds.
+
+
+K>> tic; [clusters, asgn] = vl_hikmeans(d_matrix, 2, 2); toc;
+Elapsed time is 105.230942 seconds.
+K>> tic; [clusters, asgn] = vl_hikmeans(d_matrix, 2, 4); toc;
+Elapsed time is 208.575614 seconds.
+K>> tic; [clusters, asgn] = vl_hikmeans(d_matrix, 2, 8); toc;
+Elapsed time is 384.224897 seconds.
+K>> tic; [clusters, asgn] = vl_hikmeans(d_matrix, 2, 64); toc;
+Elapsed time is 977.311548 seconds.
+K>> tic; [clusters, asgn] = vl_hikmeans(d_matrix, 2, 1024); toc;
+Elapsed time is 1572.746913 seconds.

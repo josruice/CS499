@@ -5,10 +5,12 @@ function [est_properties, svms] = SVM (features_3d_in, cell_real_properties_in, 
     % Constants.
     TRAINING = 'Training';
     TEST = 'Test';
-    SOLVER_PARAM = 'SOLVER';
+    SOLVER_PARAM = 'Solver';
+    LOSS_PARAM = 'Loss';
 
     DEFAULT_LAMBDA = 0.01;
     DEFAULT_SOLVER = 'SDCA';
+    DEFAULT_LOSS = 'Logistic';
     DEFAULT_VERBOSE = 0;
 
     PROPERTY_NAME_DELIM = '-';
@@ -24,6 +26,7 @@ function [est_properties, svms] = SVM (features_3d_in, cell_real_properties_in, 
     parser.addParamValue('SVMs', {}, @(x) length(x)>0);
     parser.addParamValue('Lambda', DEFAULT_LAMBDA, @isnumeric);
     parser.addParamValue('Solver', DEFAULT_SOLVER, @isstr);
+    parser.addParamValue('Loss', DEFAULT_LOSS, @isstr);
     parser.addParamValue('Verbose', DEFAULT_VERBOSE, @isnumeric);
 
     % Parse input arguments.
@@ -38,6 +41,7 @@ function [est_properties, svms] = SVM (features_3d_in, cell_real_properties_in, 
     svms = inputs.SVMs;
     LAMBDA = inputs.Lambda;
     SOLVER = inputs.Solver;
+    LOSS = inputs.Loss;
     VERBOSE = inputs.Verbose;
 
     % Variables to improve code legibility.
@@ -49,7 +53,7 @@ function [est_properties, svms] = SVM (features_3d_in, cell_real_properties_in, 
     % requirements: one column per example.
     features_2d = permute(features_3d, [3 2 1]);
     features_2d = reshape(features_2d, [real_num_clusters, num_images]);
-    features_2d( find(features_2d) ) = 1; % Binary histograms.
+    %features_2d( find(features_2d) ) = 1; % Binary histograms.
 
     if not(strcmp(method, TEST))
         % Cell array formed by cell arrays each with 4 elements: 
@@ -94,7 +98,7 @@ function [est_properties, svms] = SVM (features_3d_in, cell_real_properties_in, 
             feature = scale_and_feature(2);
 
             % Build the classifier for this property.
-            [W, B, ~, scores] = vl_svmtrain(features_2d, labels, LAMBDA, SOLVER_PARAM, SOLVER);
+            [W, B, ~, scores] = vl_svmtrain(features_2d, labels, LAMBDA, SOLVER_PARAM, SOLVER, LOSS_PARAM, LOSS);
 
             % Store everything in the cell data structure.
             svms{i} = {scale, feature, W, B};
@@ -119,10 +123,11 @@ function [est_properties, svms] = SVM (features_3d_in, cell_real_properties_in, 
     if VERBOSE >= 1
         % Print the resulting accuracies.
         mean_accuracy = (mean_accuracy / num_properties);
-        fprintf(1, '%s:\n', method);
-        fprintf(1, ' - Mean accuracy: %.2f\n', mean_accuracy * 100);
-        fprintf(1, ' - Min accuracy: %.2f\n', min_accuracy * 100);
-        fprintf(1, ' - Max accuracy: %.2f\n\n', max_accuracy * 100);
+        fprintf(1, 'Mean accuracy: %.2f. ', mean_accuracy * 100);
+        %fprintf(1, '%s:\n', method);
+        %fprintf(1, ' - Mean accuracy: %.2f\n', mean_accuracy * 100);
+        %fprintf(1, ' - Min accuracy: %.2f\n', min_accuracy * 100);
+        %fprintf(1, ' - Max accuracy: %.2f\n\n', max_accuracy * 100);
 
         if VERBOSE >= 2
             % Print some statistics about the current estimated properties.

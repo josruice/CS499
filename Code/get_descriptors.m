@@ -3,7 +3,7 @@
 % image_part can be 'FIRST HALF', 'SECOND HALF', 'COMPLETE'.
 % feature_method can be 'PHOW', 'SIFT', 'DSIFT'.
 
-function [descriptors, total_descriptors] = get_descriptors(root_path, folders, file_names, img_format, image_part, feature_method)
+function [descriptors, total_descriptors] = get_descriptors(root_path, folders, file_names, img_format, image_part, feature_method, max_descriptors_per_image)
 % Variables to improve code legibility.
 num_folders = length(folders);
 num_file_names = length(file_names);
@@ -41,21 +41,29 @@ descriptors = cell(num_folders, num_file_names);
             %  - The size of matrix D will be [128 num_descriptors].
             switch upper(feature_method)
             case 'PHOW'
-                [F D] = vl_phow(image);
+                [~, D] = vl_phow(image);
             case 'SIFT'
                 if ndims(image) == 3
                     image = rgb2gray(image); % Gray scale. SIFT requirement.
                 end
-                [F D] = vl_sift(image);
+                [~, D] = vl_sift(image);
             case 'DSIFT'
                 if ndims(image) == 3
                     image = rgb2gray(image); % Gray scale. DSIFT requirement.
                 end
-                [F D] = vl_dsift(image);
+                [~, D] = vl_dsift(image);
             end
 
+            % Randomly sample the descriptors if they exceed the maximum allowed.
+            num_descriptors = size(D,2);
+            if max_descriptors_per_image < num_descriptors  && ...
+               max_descriptors_per_image ~= 0 
+               D = D(:,randperm(num_descriptors, max_descriptors_per_image));
+               num_descriptors = size(D,2);
+            end
+               
             % Update the counter and store the descriptors.
-            total_descriptors = total_descriptors + size(D,2);
+            total_descriptors = total_descriptors + num_descriptors;
             descriptors{i,j} = D;
         end
     end

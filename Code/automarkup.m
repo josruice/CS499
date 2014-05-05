@@ -48,17 +48,19 @@ MARKUP_FILE = '../Markups/Machine-Markup-(1.0).txt';
 NUM_PROPERTIES_PER_IMAGE = 6;
 
 %%% Descriptors.
-FEATURE_METHOD = 'SIFT'; % PHOW, SIFT or DSIFT.
+FEATURE_METHOD = 'PHOW';            % PHOW, SIFT or DSIFT.
+MAX_DESCRIPTORS_PER_IMAGE = 1000;  % 0 means no maximum.
 
 %%% K-means
-NUM_CLUSTERS = 50;     % Min number of clusters obtained.
-DATATYPE = 'single';     % Datatype of the descriptors matrix: single or uint8.
-HIERARCHICAL = false;    % Hierarchical (only with uint8).
-BRANCHING_FACTOR = 10;  % Branching factor (only with HIERARCHICAL.
+NUM_CLUSTERS = 300;     % Min number of clusters obtained.
+DATATYPE = 'single';      % Datatype of the descriptors matrix: single or uint8.
+HIERARCHICAL = false;     % Hierarchical (only with uint8).
+BRANCHING_FACTOR = 2;    % Branching factor (only with HIERARCHICAL).
 
-%%% Suppor Vector Machines.
+%%% Support Vector Machines.
 SOLVER = 'SDCA';    % Solver method: SGD or SDCA.
-LAMBDA = 0.05;      % Lambda value of the SVM.
+LOSS = 'Logistic';  % Loss function: Hinge, Hinge2, L1, L2 or LOGISTIC.
+LAMBDA = 0.000001;  % Lambda value of the SVM.
 
 %%% Others (do NOT change).
 % Function parameters names.
@@ -71,9 +73,11 @@ TRAINING_METHOD = 'Training';
 TEST_METHOD = 'Test';
 SMVS_PARAM = 'SVMs';
 SOLVER_PARAM = 'Solver';
+LOSS_PARAM = 'Loss';
 LAMBDA_PARAM = 'Lambda';
 
 VERBOSE_PARAM = 'Verbose';
+FIGURE_NAME_PARAM = 'FigureName';
 
 
 %%%%%%%%%%%%%%%%%%
@@ -100,59 +104,80 @@ num_images = num_materials * num_file_names;
 %%% TRAINING SVMs %%%
 
 % Get the descriptors of the first half of each image in this set of images.
-[descriptors, total_descriptors] = get_descriptors(ROOT_PATH, MATERIALS, ...
-    FILE_NAMES, IMG_FORMAT, 'FIRST HALF', FEATURE_METHOD);
+disp('Execution data:');
+fprintf(1,' - Descriptors: %s\n - Num clusters: %d (datatype %s, hierarchical %d, branching %d)\n - SVM solver: %s (%s loss, lambda %f)\n\n', FEATURE_METHOD, NUM_CLUSTERS, DATATYPE, HIERARCHICAL, BRANCHING_FACTOR, SOLVER, LOSS, LAMBDA);
+disp('Training');
+fprintf(1, ' - Descriptors: '); tic;
+[training_descriptors, total_training_descriptors] = get_descriptors( ...
+    ROOT_PATH, MATERIALS, FILE_NAMES, IMG_FORMAT,                     ...
+    'FIRST HALF', FEATURE_METHOD, MAX_DESCRIPTORS_PER_IMAGE);
+fprintf('%d descriptors. ', total_training_descriptors); toc;
 
 % Quantize the feature descriptors using k-means.
-[features_3d, clusters, real_num_clusters] = quantize_feature_vectors (  ...
-    descriptors, total_descriptors, NUM_CLUSTERS,                        ...
-    DATATYPE_PARAM,     DATATYPE,                                        ...
-    HIERARCHICAL_PARAM, HIERARCHICAL,                                    ...
+fprintf(1, ' - Kmeans: '); tic;
+[training_features_3d, clusters, real_num_clusters] = quantize_feature_vectors(...
+    training_descriptors, total_training_descriptors, NUM_CLUSTERS,            ...
+    DATATYPE_PARAM,     DATATYPE,                                              ...
+    HIERARCHICAL_PARAM, HIERARCHICAL,                                          ...
     BRANCHING_PARAM,    BRANCHING_FACTOR);
+fprintf('%d clusters. ', real_num_clusters); toc;
 
 % Use SVM to create the linear clasifiers for the properties.
 % SVM cell structure: 'scale', 'feature', weight vector (W), bias (B).
-[~, svms] = SVM (features_3d, cell_real_properties, TRAINING_METHOD, ...
-    LAMBDA_PARAM,  LAMBDA,                                                 ...
-    SOLVER_PARAM,  SOLVER,                                                 ...
+fprintf(1, ' - SMVs: '); tic;
+[~, svms] = SVM (training_features_3d, cell_real_properties, TRAINING_METHOD, ...
+    LAMBDA_PARAM,  LAMBDA,                                                    ...
+    SOLVER_PARAM,  SOLVER,                                                    ...
+    LOSS_PARAM,    LOSS,                                                      ...
     VERBOSE_PARAM, VERBOSE);
+toc;
 
 
 %%% TESTING SVMs %%%
 
 % Get the descriptors of the second half of each image in this set of images.
-[descriptors, total_descriptors] = get_descriptors(ROOT_PATH, MATERIALS, ...
-    FILE_NAMES, IMG_FORMAT, 'SECOND HALF', FEATURE_METHOD);
+disp('Testing: ');
+fprintf(1, ' - Descriptors: '); tic;
+[test_descriptors, total_test_descriptors] = get_descriptors(   ...
+    ROOT_PATH, MATERIALS, FILE_NAMES, IMG_FORMAT,               ...
+    'SECOND HALF', FEATURE_METHOD, MAX_DESCRIPTORS_PER_IMAGE);
+fprintf('%d descriptors. ', total_test_descriptors); toc;
 
 % Quantize the feature descriptors using k-means.
-features_3d = quantize_feature_vectors (                            ...
-    descriptors, total_descriptors, real_num_clusters,              ...
-    CLUSTERS_PARAM,     clusters,                                   ...
-    DATATYPE_PARAM,     DATATYPE,                                   ...
-    HIERARCHICAL_PARAM, HIERARCHICAL,                               ...
+fprintf(1, ' - Kmeans: '); tic;
+test_features_3d = quantize_feature_vectors (                            ...
+    test_descriptors, total_test_descriptors, real_num_clusters,         ...
+    CLUSTERS_PARAM,     clusters,                                        ...
+    DATATYPE_PARAM,     DATATYPE,                                        ...
+    HIERARCHICAL_PARAM, HIERARCHICAL,                                    ...
     BRANCHING_PARAM,    BRANCHING_FACTOR);
+toc;
 
 % Use the previous created SVMs with the training data to estimate the 
 % vectors of properties of the test images.
-est_properties = SVM (features_3d, cell_real_properties, TEST_METHOD, ...
-    SMVS_PARAM,  svms,                                                ...
+fprintf(1, ' - SVMs: '); tic;
+est_properties = SVM (test_features_3d, cell_real_properties, TEST_METHOD, ...
+    SMVS_PARAM,  svms,                                                     ...
     VERBOSE_PARAM, VERBOSE);
+toc;
 
+%keyboard;
 
 %%% Naive Bayes %%%
 
 %% Predicted data.
 if VERBOSE >= 1
-    fprintf(1, 'Predicted data:\n - ');
+    fprintf(1, '\n[Predicted data] ');
 end
-bayes = NB (est_properties, MATERIALS, VERBOSE_PARAM, VERBOSE);
+bayes = NB (est_properties, MATERIALS, VERBOSE_PARAM, VERBOSE, ...
+            FIGURE_NAME_PARAM, 'Naive Bayes Confusion - Predicted Data');
 
 %% Ground truth data.
 if VERBOSE >= 1
-    fprintf(1, 'Ground truth data:\n - ');
+    fprintf(1, '[Ground truth data] ');
 end
-bayes = NB (real_properties, MATERIALS, VERBOSE_PARAM, VERBOSE);
-
+bayes = NB (real_properties, MATERIALS, VERBOSE_PARAM, VERBOSE, ...
+            FIGURE_NAME_PARAM, 'Naive Bayes Confusion - Ground Truth');
 
 %keyboard;
 
@@ -212,10 +237,7 @@ end
 
 % Check the accuracy of the results.
 mean_accuracy = (mean_accuracy / num_materials);
-fprintf(1, '\nSVMs with predicted data:\n')
-fprintf(1, ' - Correctly classified: %d (%.2f %%)\n', floor(mean_accuracy*num_images), mean_accuracy*100);
-fprintf(1, ' - NOT-correctly classified: %d (%.2f %%)\n', ceil((1-mean_accuracy)*num_images), 100-(mean_accuracy*100));
-
+fprintf(1, '\n[Predicted data] Correct with SVMs: %d out of %d (%.2f %%)\n', floor(mean_accuracy*num_images), num_images, mean_accuracy*100);
 
 %% Ground truth data.
 
@@ -263,10 +285,7 @@ end
 
 % Check the accuracy of the results.
 mean_accuracy = (mean_accuracy / num_materials);
-fprintf(1, 'SVMs with real data:\n');
-fprintf(1, ' - Correctly classified: %d (%.2f %%)\n', floor(mean_accuracy*num_images), mean_accuracy*100);
-fprintf(1, ' - NOT-correctly classified: %d (%.2f %%)\n', ceil((1-mean_accuracy)*num_images), 100-(mean_accuracy*100));
-fprintf(1, '\n');
+fprintf(1, '[Ground truth data] Correct with SVMs: %d out of %d (%.2f %%)\n', floor(mean_accuracy*num_images), num_images, mean_accuracy*100);
 
 
 %%% SVMs with real one vs. all %%%
@@ -275,23 +294,23 @@ fprintf(1, '\n');
 
 est_scores = (est_weights_material_svms' * est_properties) + repmat(est_bias_material_svms, [1, num_images]);
 [~,I] = max(est_scores);
+confusion = accumarray([ceil([1:num_images]./num_file_names); I]', 1) ./ num_file_names;
+plot_confusion(confusion, 'SMVs Confusion - Predicted Data', MATERIALS); 
+[~,I] = max(est_scores);
 indices_well_classified = cellfun(@strcmp, MATERIALS(I)', material_labels(:));
 num_correctly_classified = sum(indices_well_classified);
 
-fprintf(1, 'SVMs with one vs. all and predicted data:\n');
-fprintf(1, ' - Correctly classified: %d (%.2f %%)\n', num_correctly_classified, num_correctly_classified*100/num_images);
-fprintf(1, ' - NOT-correctly classified: %d (%.2f %%)\n', num_images-num_correctly_classified, 100-(num_correctly_classified*100/num_images));
+fprintf(1, '\n[Predicted data] Correct with SVMs (one vs. all): %d out of %d (%.2f %%)\n', num_correctly_classified, num_images, num_correctly_classified*100/num_images);
 
 %% Ground truth data.
 
 real_scores = (real_weights_material_svms' * real_properties) + repmat(real_bias_material_svms, [1, num_images]);
 [~,I] = max(real_scores);
+confusion = accumarray([ceil([1:num_images]./num_file_names); I]', 1) ./ num_file_names;
+plot_confusion(confusion, 'SMVs Confusion - Ground Truth', MATERIALS); 
 indices_well_classified = cellfun(@strcmp, MATERIALS(I)', material_labels(:));
 num_correctly_classified = sum(indices_well_classified);
 
-fprintf(1, 'SVMs with one vs. all and ground truth data:\n');
-fprintf(1, ' - Correctly classified: %d (%.2f %%)\n', num_correctly_classified, num_correctly_classified*100/num_images);
-fprintf(1, ' - NOT-correctly classified: %d (%.2f %%)\n', num_images-num_correctly_classified, 100-(num_correctly_classified*100/num_images));
-fprintf(1, '\n');
+fprintf(1, '[Ground truth data] Correct with SVMs (one vs. all): %d out of %d (%.2f %%)\n', num_correctly_classified, num_images, num_correctly_classified*100/num_images);
 
 %keyboard;

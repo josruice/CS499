@@ -26,7 +26,6 @@ function [features, clusters, num_clusters] = quantize_feature_vectors (descript
     % Parse input arguments.
     parser.parse(descriptors_in, total_descriptors_in, num_clusters_in, varargin{:});
 
-
     % Read the arguments.
     inputs = parser.Results;
     descriptors = inputs.Descriptors;
@@ -41,19 +40,16 @@ function [features, clusters, num_clusters] = quantize_feature_vectors (descript
     % Get the size of the descriptors cell.
     [num_rows num_columns] = size(descriptors);
 
-    % Convert the descriptors cell array into a standard 2D matrix with the
-    % descriptors in the columns.
-    [d_matrix, num_descriptors] = descriptors_cell_to_matrix(descriptors, total_descriptors);
-
-
     % If no clusters have been given, build the clusters applying k-means 
     % clustering to the descriptors matrix and obtain the center associated with
     % each descriptor.
     % Otherwise, use the given clusters to obtain the center associated with each
     % descriptor.
     if strcmp(datatype, UINT8_DATATYPE)
-        d_matrix = uint8(d_matrix); % Convert the matrix datatype to uint8.
-
+        % Convert the descriptors cell array into a standard 2D matrix with the
+        % descriptors in the columns and the required datatype.
+        [d_matrix, num_descriptors] = descriptors_cell_to_matrix(descriptors, total_descriptors, UINT8_DATATYPE);
+        
         if hierarchical
             if isempty(clusters)
                 [clusters, asgn] = vl_hikmeans(d_matrix, branching_factor, num_clusters);
@@ -72,7 +68,7 @@ function [features, clusters, num_clusters] = quantize_feature_vectors (descript
             if isempty(clusters)
                 [clusters, indices] = vl_ikmeans(d_matrix, num_clusters);
             else
-                indices = vl_ikmeans(d_matrix, clusters); 
+                indices = vl_ikmeanspush(d_matrix, clusters); 
             end
         end
     else
@@ -80,7 +76,9 @@ function [features, clusters, num_clusters] = quantize_feature_vectors (descript
             fprintf(1, 'Wrong parameters. Default execution.\n');
         end
 
-        d_matrix = single(d_matrix); % Convert the matrix datatype to single.
+        % Convert the descriptors cell array into a standard 2D matrix with the
+        % descriptors in the columns and the required datatype.
+        [d_matrix, num_descriptors] = descriptors_cell_to_matrix(descriptors, total_descriptors, SINGLE_DATATYPE);
 
         if isempty(clusters)
             [clusters, indices] = vl_kmeans(d_matrix, num_clusters);  

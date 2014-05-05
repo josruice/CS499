@@ -4,6 +4,8 @@ function [bayes] = NB (properties, materials, varargin)
 
     % Constants.
     DEFAULT_VERBOSE = 0;
+    DEFAULT_FIGURENAME = 'Naive Bayes Confusion';
+
     DISTRIBUTION_PARAM = 'Distribution';
     DISTRIBUTION = 'mn';
 
@@ -14,6 +16,7 @@ function [bayes] = NB (properties, materials, varargin)
     parser.addRequired('Properties', @(x) length(x)>0);
     parser.addRequired('Materials', @(x) length(x)>0);
     parser.addParamValue('Verbose', DEFAULT_VERBOSE, @isnumeric);
+    parser.addParamValue('FigureName', DEFAULT_FIGURENAME, @isstr);
 
     % Parse input arguments.
     parser.parse(properties, materials, varargin{:});
@@ -23,6 +26,7 @@ function [bayes] = NB (properties, materials, varargin)
     properties = inputs.Properties;
     materials = inputs.Materials; 
     VERBOSE = inputs.Verbose;
+    FIGURE_NAME = inputs.FigureName;
 
     % Variables to improve code legibility.
     [num_materials, num_file_names, num_properties] = size(properties);
@@ -40,9 +44,13 @@ function [bayes] = NB (properties, materials, varargin)
 
     if VERBOSE >= 1
         % Check and print the accuracy of the results.
-        indices_well_classified = cellfun(@strcmp, bayes.predict(properties'), material_labels(:));
-        num_correctly_classified = sum(indices_well_classified);
+        I = cellfun(@(x) find(strcmp(x, materials)), bayes.predict(properties'));
+        num_correctly_classified = sum(I == ceil([1:num_images]./num_file_names)');
 
-        fprintf(1, 'Correctly classified with Naive Bayes: %d out of %d (%.2f %%)\n', num_correctly_classified, num_images, num_correctly_classified*100/num_images);
+        fprintf(1, 'Correct with Naive Bayes: %d out of %d (%.2f %%)\n', num_correctly_classified, num_images, num_correctly_classified*100/num_images);
+
+        % Compute and plot the confusion matrix.
+        confusion = accumarray([ceil([1:num_images]./num_file_names); I']', 1) ./ num_file_names;
+        plot_confusion(confusion, FIGURE_NAME, materials);
     end
 end

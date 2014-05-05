@@ -1,0 +1,147 @@
+Execution data:
+ - Descriptors: SIFT
+ - Num clusters: 1000 (datatype uint8, hierarchical 0, branching 10)
+ - SVM solver: SDCA (Logistic loss, lambda 0.010000)
+
+Training
+ - Descriptors: 50719 descriptors. Elapsed time is 17.188046 seconds.
+ - Kmeans: 1000 clusters. Elapsed time is 377.368085 seconds.
+ - SMVs: Mean accuracy: 99.90. Elapsed time is 0.191668 seconds.
+Testing
+ - Descriptors: 49650 descriptors. Elapsed time is 16.640511 seconds.
+ - Kmeans: Elapsed time is 5.847678 seconds.
+ - SVMs: Mean accuracy: 86.00. Elapsed time is 0.008571 seconds.
+
+[Predicted data] Correct with Naive Bayes: 87 out of 216 (40.28 %)
+[Ground truth data] Correct with Naive Bayes: 183 out of 216 (84.72 %)
+
+[Predicted data] Correct with SVMs: 205 out of 216 (94.96 %)
+[Ground truth data] Correct with SVMs: 212 out of 216 (98.59 %)
+
+[Predicted data] Correct with SVMs (one vs. all): 100 out of 216 (46.30 %)
+[Ground truth data] Correct with SVMs (one vs. all): 189 out of 216 (87.50 %)
+
+________________________________________________________________________________
+
+Execution data:
+ - Descriptors: SIFT
+ - Num clusters: 1000 (datatype uint8, hierarchical 1, branching 100)
+ - SVM solver: SDCA (Logistic loss, lambda 0.010000)
+
+Training
+ - Descriptors: 50719 descriptors. Elapsed time is 17.703473 seconds.
+ - Kmeans: 10000 clusters. Elapsed time is 71.608292 seconds.
+ - SMVs: Mean accuracy: 99.91. Elapsed time is 1.455351 seconds.
+Testing: 
+ - Descriptors: 49650 descriptors. Elapsed time is 16.839803 seconds.
+ - Kmeans: Elapsed time is 1.329129 seconds.
+ - SVMs: Mean accuracy: 85.97. Elapsed time is 0.057679 seconds.
+
+[Predicted data] Correct with Naive Bayes: 78 out of 216 (36.11 %)
+[Ground truth data] Correct with Naive Bayes: 183 out of 216 (84.72 %)
+
+[Predicted data] Correct with SVMs: 204 out of 216 (94.86 %)
+[Ground truth data] Correct with SVMs: 212 out of 216 (98.56 %)
+
+[Predicted data] Correct with SVMs (one vs. all): 72 out of 216 (33.33 %)
+[Ground truth data] Correct with SVMs (one vs. all): 188 out of 216 (87.04 %)
+
+________________________________________________________________________________
+
+Execution data:
+ - Descriptors: SIFT
+ - Num clusters: 100000 (datatype uint8, hierarchical 1, branching 100)
+ - SVM solver: SDCA (Logistic loss, lambda 0.010000)
+
+Training
+ - Descriptors: 50719 descriptors. Elapsed time is 17.171461 seconds.
+ - Kmeans: 1000000 clusters. Elapsed time is 78.925303 seconds.
+ - SMVs: Mean accuracy: 99.91. Elapsed time is 126.114574 seconds.
+Testing: 
+ - Descriptors: 49650 descriptors. Elapsed time is 16.974003 seconds.
+ - Kmeans: Elapsed time is 5.188758 seconds.
+ - SVMs: Mean accuracy: 84.32. Elapsed time is 3.016446 seconds.
+
+[Predicted data] Correct with Naive Bayes: 62 out of 216 (28.70 %)
+[Ground truth data] Correct with Naive Bayes: 183 out of 216 (84.72 %)
+
+[Predicted data] Correct with SVMs: 204 out of 216 (94.57 %)
+[Ground truth data] Correct with SVMs: 213 out of 216 (98.64 %)
+
+[Predicted data] Correct with SVMs (one vs. all): 37 out of 216 (17.13 %)
+[Ground truth data] Correct with SVMs (one vs. all): 191 out of 216 (88.43 %)
+
+________________________________________________________________________________
+
+Execution data:
+ - Descriptors: SIFT
+ - Num clusters: 100000 (datatype uint8, hierarchical 1, branching 10)
+ - SVM solver: SDCA (Logistic loss, lambda 0.010000)
+
+Training
+ - Descriptors: 50719 descriptors. Elapsed time is 17.267367 seconds.
+ - Kmeans: 100000 clusters. Elapsed time is 12.520893 seconds.
+ - SMVs: Mean accuracy: 99.91. Elapsed time is 13.010717 seconds.
+Testing: 
+ - Descriptors: 49650 descriptors. Elapsed time is 16.706880 seconds.
+ - Kmeans: Elapsed time is 0.713581 seconds.
+ - SVMs: Mean accuracy: 84.55. Elapsed time is 0.240329 seconds.
+
+[Predicted data] Correct with Naive Bayes: 63 out of 216 (29.17 %)
+[Ground truth data] Correct with Naive Bayes: 183 out of 216 (84.72 %)
+
+[Predicted data] Correct with SVMs: 204 out of 216 (94.68 %)
+[Ground truth data] Correct with SVMs: 212 out of 216 (98.53 %)
+
+[Predicted data] Correct with SVMs (one vs. all): 62 out of 216 (28.70 %)
+[Ground truth data] Correct with SVMs (one vs. all): 188 out of 216 (87.04 %)
+
+________________________________________________________________________________
+
+Execution data:
+ - Descriptors: SIFT
+ - Num clusters: 100 (datatype single, hierarchical 0, branching 10)
+ - SVM solver: SDCA (Logistic loss, lambda 0.010000)
+
+Training
+ - Descriptors: 50719 descriptors. Elapsed time is 17.148968 seconds.
+ - Kmeans: 100 clusters. Elapsed time is 3.065442 seconds.
+ - SMVs: Mean accuracy: 91.26. Elapsed time is 0.075630 seconds.
+Testing: 
+ - Descriptors: 49650 descriptors. Elapsed time is 16.578876 seconds.
+ - Kmeans: Elapsed time is 0.285637 seconds.
+ - SVMs: Mean accuracy: 81.68. Elapsed time is 0.007086 seconds.
+
+[Predicted data] Correct with Naive Bayes: 78 out of 216 (36.11 %)
+[Ground truth data] Correct with Naive Bayes: 183 out of 216 (84.72 %)
+
+[Predicted data] Correct with SVMs: 204 out of 216 (94.62 %)
+[Ground truth data] Correct with SVMs: 212 out of 216 (98.61 %)
+
+[Predicted data] Correct with SVMs (one vs. all): 81 out of 216 (37.50 %)
+[Ground truth data] Correct with SVMs (one vs. all): 193 out of 216 (89.35 %)
+
+________________________________________________________________________________
+
+Execution data:
+ - Descriptors: PHOW
+ - Num clusters: 1024 (datatype uint8, hierarchical 1, branching 2)
+ - SVM solver: SDCA (Logistic loss, lambda 0.010000)
+
+Training
+ - Descriptors: 12072766 descriptors. Elapsed time is 51.000703 seconds.
+ - Kmeans: 1024 clusters. Elapsed time is 1357.230394 seconds.
+ - SMVs: Mean accuracy: 95.56. Elapsed time is 0.377857 seconds.
+Testing: 
+ - Descriptors: 12110370 descriptors. Elapsed time is 51.569751 seconds.
+ - Kmeans: Elapsed time is 37.307206 seconds.
+ - SVMs: Mean accuracy: 87.34. Elapsed time is 0.039648 seconds.
+
+[Predicted data] Correct with Naive Bayes: 104 out of 216 (48.15 %)
+[Ground truth data] Correct with Naive Bayes: 183 out of 216 (84.72 %)
+
+[Predicted data] Correct with SVMs: 205 out of 216 (95.27 %)
+[Ground truth data] Correct with SVMs: 212 out of 216 (98.61 %)
+
+[Predicted data] Correct with SVMs (one vs. all): 110 out of 216 (50.93 %)
+[Ground truth data] Correct with SVMs (one vs. all): 191 out of 216 (88.43 %)
