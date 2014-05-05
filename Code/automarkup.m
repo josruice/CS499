@@ -52,7 +52,7 @@ FEATURE_METHOD = 'PHOW';            % PHOW, SIFT or DSIFT.
 MAX_DESCRIPTORS_PER_IMAGE = 1000;  % 0 means no maximum.
 
 %%% K-means
-NUM_CLUSTERS = 300;     % Min number of clusters obtained.
+NUM_CLUSTERS = 500;     % Min number of clusters obtained.
 DATATYPE = 'single';      % Datatype of the descriptors matrix: single or uint8.
 HIERARCHICAL = false;     % Hierarchical (only with uint8).
 BRANCHING_FACTOR = 2;    % Branching factor (only with HIERARCHICAL).
@@ -98,14 +98,23 @@ num_images = num_materials * num_file_names;
 % with one row per different property, where each of the elements store the name
 % of the property (scale-property_name) and a column vector with the images that 
 % have the property. 
+% The output matrix contains as many rows and columns as materials an images per 
+% material and for each of them a binary vector with the properties.
 [cell_real_properties, real_properties, num_properties] = read_markup(MARKUP_FILE, num_materials, num_file_names);
 
 
-%%% TRAINING SVMs %%%
+% --------------------------------------------------------------------------- %
 
-% Get the descriptors of the first half of each image in this set of images.
 disp('Execution data:');
 fprintf(1,' - Descriptors: %s\n - Num clusters: %d (datatype %s, hierarchical %d, branching %d)\n - SVM solver: %s (%s loss, lambda %f)\n\n', FEATURE_METHOD, NUM_CLUSTERS, DATATYPE, HIERARCHICAL, BRANCHING_FACTOR, SOLVER, LOSS, LAMBDA);
+
+% --------------------------------------------------------------------------- %
+
+%%%
+%%% Training SVMs for properties detection. 
+%%%
+
+% Get the descriptors of the first half of each image in this set of images.
 disp('Training');
 fprintf(1, ' - Descriptors: '); tic;
 [training_descriptors, total_training_descriptors] = get_descriptors( ...
@@ -115,7 +124,8 @@ fprintf('%d descriptors. ', total_training_descriptors); toc;
 
 % Quantize the feature descriptors using k-means.
 fprintf(1, ' - Kmeans: '); tic;
-[training_features_3d, clusters, real_num_clusters] = quantize_feature_vectors(...
+[quantized_training_descriptors, clusters, real_num_clusters] =                ...
+quantize_feature_vectors (                                                     ...
     training_descriptors, total_training_descriptors, NUM_CLUSTERS,            ...
     DATATYPE_PARAM,     DATATYPE,                                              ...
     HIERARCHICAL_PARAM, HIERARCHICAL,                                          ...
@@ -123,9 +133,11 @@ fprintf(1, ' - Kmeans: '); tic;
 fprintf('%d clusters. ', real_num_clusters); toc;
 
 % Use SVM to create the linear clasifiers for the properties.
-% SVM cell structure: 'scale', 'feature', weight vector (W), bias (B).
+% SVM cell structure: 'scale-feature', weight vector (W), bias (B).
 fprintf(1, ' - SMVs: '); tic;
-[~, svms] = SVM (training_features_3d, cell_real_properties, TRAINING_METHOD, ...
+[~, properties_svms] =                                                        ...
+SVM (quantized_training_descriptors, cell_real_properties,                    ...
+    TRAINING_METHOD,                                                          ...
     LAMBDA_PARAM,  LAMBDA,                                                    ...
     SOLVER_PARAM,  SOLVER,                                                    ...
     LOSS_PARAM,    LOSS,                                                      ...
@@ -133,7 +145,11 @@ fprintf(1, ' - SMVs: '); tic;
 toc;
 
 
-%%% TESTING SVMs %%%
+% --------------------------------------------------------------------------- %
+
+%%%
+%%% Testing SVMs for properties detection.
+%%%
 
 % Get the descriptors of the second half of each image in this set of images.
 disp('Testing: ');
@@ -145,7 +161,7 @@ fprintf('%d descriptors. ', total_test_descriptors); toc;
 
 % Quantize the feature descriptors using k-means.
 fprintf(1, ' - Kmeans: '); tic;
-test_features_3d = quantize_feature_vectors (                            ...
+quantized_test_descriptors_3d = quantize_feature_vectors (               ...
     test_descriptors, total_test_descriptors, real_num_clusters,         ...
     CLUSTERS_PARAM,     clusters,                                        ...
     DATATYPE_PARAM,     DATATYPE,                                        ...
@@ -153,17 +169,21 @@ test_features_3d = quantize_feature_vectors (                            ...
     BRANCHING_PARAM,    BRANCHING_FACTOR);
 toc;
 
-% Use the previous created SVMs with the training data to estimate the 
+% Use the previously created SVMs with the training data to estimate the 
 % vectors of properties of the test images.
 fprintf(1, ' - SVMs: '); tic;
-est_properties = SVM (test_features_3d, cell_real_properties, TEST_METHOD, ...
-    SMVS_PARAM,  svms,                                                     ...
+est_properties = SVM (quantized_test_descriptors_3d, cell_real_properties, ...
+    TEST_METHOD,                                                           ...
+    SMVS_PARAM,    properties_svms,                                        ...
     VERBOSE_PARAM, VERBOSE);
 toc;
 
-%keyboard;
 
-%%% Naive Bayes %%%
+% --------------------------------------------------------------------------- %
+
+%%%
+%%% Naive Bayes for material detection.
+%%%
 
 %% Predicted data.
 if VERBOSE >= 1
@@ -179,9 +199,35 @@ end
 bayes = NB (real_properties, MATERIALS, VERBOSE_PARAM, VERBOSE, ...
             FIGURE_NAME_PARAM, 'Naive Bayes Confusion - Ground Truth');
 
-%keyboard;
 
-%%% SVMs %%%
+% --------------------------------------------------------------------------- %
+
+%%%
+%%% Training SVMs for material labeling. 
+%%%
+
+% Build a cell array with one cell per material with its name and a binary vector
+% with the images of that material.
+cell_materials = cell(num_materials, 1);
+for i = 1:num_materials,
+    material_labels = zeros(num_images, 1);
+    material_labels((i-1)*num_file_names+1 : i*num_file_names) = 1;
+    cell_materials{i} = {MATERIALS{i}, material_labels};
+end
+
+% Use SVM to create the linear clasifiers for the materials.
+% SVM cell structure: 'material_name', weight vector (W), bias (B).
+[~, materials_svms] = SVM (real_properties, cell_materials, TRAINING_METHOD,  ...
+    LAMBDA_PARAM,  LAMBDA,                                                    ...
+    SOLVER_PARAM,  SOLVER,                                                    ...
+    LOSS_PARAM,    LOSS,                                                      ...
+    VERBOSE_PARAM, VERBOSE-1);
+
+% --------------------------------------------------------------------------- %
+
+%%%
+%%% Testing SVMs (one vs. all) for material labeling. 
+%%%
 
 % Permute and reshape the class labels and the properties vectors to fit the
 % SVMs requirements.
@@ -191,120 +237,26 @@ est_properties = reshape(est_properties, [num_properties, num_images]);
 real_properties = permute(real_properties, [3 2 1]);
 real_properties = reshape(real_properties, [num_properties, num_images]);
 
-%% Predicted data.
-
-% Cell array formed by cell arrays each with 3 elements: 
-% Material name string, SVM weight vector, SVM bias.
-est_material_svms = cell(num_materials, 1);
-
 % Matrix with the weight vectors of the material svms as columns.
-est_weights_material_svms = zeros(num_properties, num_materials);
+weights_materials_svms = extract_from_cell (materials_svms, 2);
 
 % Column vector with the bias of the materials svms.
-est_bias_material_svms = zeros(num_materials, 1);
-
-% Variables used to test the accuracy.
-min_accuracy = 1;
-max_accuracy = 0;
-mean_accuracy = 0;
-
-% Use one vs. all multiclass classification.
-for i = 1:num_materials,
-    % Build the column vector with the labels.
-    labels = -ones(num_images, 1);
-    labels( (1:num_file_names) + ((i-1)*num_file_names) ) = 1;
-
-    % Build the classifier for this property.
-    [W,B,~,scores] = vl_svmtrain(est_properties, labels, LAMBDA, SOLVER_PARAM, SOLVER);
-
-    % Store everything in the cell data structure and the matrix of weights
-    % and vector of bias.
-    est_material_svms{i} = {MATERIALS(i), W, B};
-    est_weights_material_svms(:,i) = W;
-    est_bias_material_svms(i) = B;
-
-    % Elements with score 0 (on the line of the linear classifier) are
-    % the same as negative (don't have the property).
-    estimated_labels = sign(scores); % Returns -1, 0 or 1, depending on sign.
-    estimated_labels( find(estimated_labels == 0) ) = -1;
-
-    % Testing accuracy in the training set.
-    accuracy = sum(labels == sign(estimated_labels')) / length(labels);
-    mean_accuracy = mean_accuracy + accuracy;
-    min_accuracy = min(min_accuracy, accuracy);
-    max_accuracy = max(max_accuracy, accuracy);
-end
-
-% Check the accuracy of the results.
-mean_accuracy = (mean_accuracy / num_materials);
-fprintf(1, '\n[Predicted data] Correct with SVMs: %d out of %d (%.2f %%)\n', floor(mean_accuracy*num_images), num_images, mean_accuracy*100);
-
-%% Ground truth data.
-
-% Cell array formed by cell arrays each with 3 elements: 
-% Material name string, SVM weight vector, SVM bias.
-real_material_svms = cell(num_materials, 1);
-
-% Matrix with the weight vectors of the material svms as columns.
-real_weights_material_svms = zeros(num_properties, num_materials);
-
-% Column vector with the bias of the materials svms.
-real_bias_material_svms = zeros(num_materials, 1);
-
-% Variables used to test the accuracy.
-min_accuracy = 1;
-max_accuracy = 0;
-mean_accuracy = 0;
-
-% Use one vs. all multiclass classification.
-for i = 1:num_materials,
-    % Build the column vector with the labels.
-    labels = -ones(num_images, 1);
-    labels( (1:num_file_names) + ((i-1)*num_file_names) ) = 1;
-
-    % Build the classifier for this property.
-    [W,B,~,scores] = vl_svmtrain(real_properties, labels, LAMBDA, SOLVER_PARAM, SOLVER);
-
-    % Store everything in the cell data structure and the matrix of weights
-    % and vector of bias.
-    real_material_svms{i} = {MATERIALS(i), W, B};
-    real_weights_material_svms(:,i) = W;
-    real_bias_material_svms(i) = B;
-
-    % Elements with score 0 (on the line of the linear classifier) are
-    % the same as negative (don't have the property).
-    estimated_labels = sign(scores); % Returns -1, 0 or 1, depending on sign.
-    estimated_labels( find(estimated_labels == 0) ) = -1;
-
-    % Testing accuracy in the training set.
-    accuracy = sum(labels == sign(estimated_labels')) / length(labels);
-    mean_accuracy = mean_accuracy + accuracy;
-    min_accuracy = min(min_accuracy, accuracy);
-    max_accuracy = max(max_accuracy, accuracy);
-end
-
-% Check the accuracy of the results.
-mean_accuracy = (mean_accuracy / num_materials);
-fprintf(1, '[Ground truth data] Correct with SVMs: %d out of %d (%.2f %%)\n', floor(mean_accuracy*num_images), num_images, mean_accuracy*100);
-
-
-%%% SVMs with real one vs. all %%%
+bias_materials_svms = extract_from_cell (materials_svms, 3);
 
 %% Predicted data.
-
-est_scores = (est_weights_material_svms' * est_properties) + repmat(est_bias_material_svms, [1, num_images]);
+est_scores = (weights_materials_svms' * est_properties) + ...
+              repmat(bias_materials_svms, [1, num_images]);
 [~,I] = max(est_scores);
 confusion = accumarray([ceil([1:num_images]./num_file_names); I]', 1) ./ num_file_names;
 plot_confusion(confusion, 'SMVs Confusion - Predicted Data', MATERIALS); 
-[~,I] = max(est_scores);
 indices_well_classified = cellfun(@strcmp, MATERIALS(I)', material_labels(:));
 num_correctly_classified = sum(indices_well_classified);
 
 fprintf(1, '\n[Predicted data] Correct with SVMs (one vs. all): %d out of %d (%.2f %%)\n', num_correctly_classified, num_images, num_correctly_classified*100/num_images);
 
 %% Ground truth data.
-
-real_scores = (real_weights_material_svms' * real_properties) + repmat(real_bias_material_svms, [1, num_images]);
+real_scores = (weights_materials_svms' * real_properties) + ...
+               repmat(bias_materials_svms, [1, num_images]);
 [~,I] = max(real_scores);
 confusion = accumarray([ceil([1:num_images]./num_file_names); I]', 1) ./ num_file_names;
 plot_confusion(confusion, 'SMVs Confusion - Ground Truth', MATERIALS); 
@@ -313,4 +265,5 @@ num_correctly_classified = sum(indices_well_classified);
 
 fprintf(1, '[Ground truth data] Correct with SVMs (one vs. all): %d out of %d (%.2f %%)\n', num_correctly_classified, num_images, num_correctly_classified*100/num_images);
 
-%keyboard;
+% --------------------------------------------------------------------------- %
+
