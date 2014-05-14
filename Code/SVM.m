@@ -1,137 +1,199 @@
-% TODO: Write proper documentation.
+function [estimatedLabelsCellArray, svmsCellArray] = svm (featuresCellArray, realClassLabelsCellArray, modality, varargin)
+% svm Trains or tests SVMs using the given sample features and labels.
 
-function [estimated_labels, svms] = SVM (features_3d, cell_real_labels, modality, varargin)
+% Load constants file.
+loadConstants;
 
-    % Constants.
-    TRAINING = 'Training';
-    TEST = 'Test';
-    SOLVER_PARAM = 'Solver';
-    LOSS_PARAM = 'Loss';
+% Create arguments parser.
+parser = inputParser;
 
-    DEFAULT_SVMS = {};
-    DEFAULT_BINARY_HISTOGRAMS = false;
-    DEFAULT_LAMBDA = 0.01;
-    DEFAULT_SOLVER = 'SDCA';
-    DEFAULT_LOSS = 'Logistic';
-    DEFAULT_VERBOSE = 0;
+% Add required and parametrized arguments.
+parser.addRequired(FEATURES_PARAM, @(x) length(x)>0);
+parser.addRequired(LABELS_PARAM, @(x) length(x)>0);
+parser.addRequired(MODALITY_PARAM, @isstr);
 
-    % Create arguments parser.
-    parser = inputParser;
+parser.addParamValue(SVMS_PARAM, DEFAULT_SVMS, @(x) length(x)>0);
+parser.addParamValue(BINARY_HISTOGRAMS_PARAM, DEFAULT_BINARY_HISTOGRAMS, ...
+                     @islogical);
+parser.addParamValue(LAMBDA_PARAM, DEFAULT_LAMBDA, @isnumeric);
+parser.addParamValue(SOLVER_PARAM, DEFAULT_SOLVER, @isstr);
+parser.addParamValue(LOSS_PARAM, DEFAULT_LOSS, @isstr);
+parser.addParamValue(VERBOSE_PARAM, DEFAULT_VERBOSE, @isnumeric);
 
-    % Add required and parametrized arguments.
-    parser.addRequired('Features', @(x) length(x)>0);
-    parser.addRequired('Labels', @(x) length(x)>0);
-    parser.addRequired('Modality', @isstr);
+% Parse input arguments.
+parser.parse(featuresCellArray, realClassLabelsCellArray, modality, varargin{:});
+inputs = parser.Results;
 
-    parser.addParamValue('SVMs', DEFAULT_SVMS, @(x) length(x)>0);
-    parser.addParamValue('BinaryHistograms', DEFAULT_BINARY_HISTOGRAMS, @islogical);
-    parser.addParamValue('Lambda', DEFAULT_LAMBDA, @isnumeric);
-    parser.addParamValue('Solver', DEFAULT_SOLVER, @isstr);
-    parser.addParamValue('Loss', DEFAULT_LOSS, @isstr);
-    parser.addParamValue('Verbose', DEFAULT_VERBOSE, @isnumeric);
+% Read the arguments.
+featuresCellArray = inputs.(FEATURES_PARAM);
+realClassLabelsCellArray = inputs.(LABELS_PARAM); 
+modality = inputs.(MODALITY_PARAM);
 
-    % Parse input arguments.
-    parser.parse(features_3d, cell_real_labels, modality, varargin{:});
+svmsCellArray = inputs.(SVMS_PARAM);
+shouldBinaryHistograms = inputs.(BINARY_HISTOGRAMS_PARAM);
+lambda = inputs.(LAMBDA_PARAM);
+solver = inputs.(SOLVER_PARAM);
+loss = inputs.(LOSS_PARAM);
+verbose = inputs.(VERBOSE_PARAM);
 
-    % Read the arguments.
-    inputs = parser.Results;
-    features_3d = inputs.Features;
-    cell_real_labels = inputs.Labels; 
-    modality = inputs.Modality;
+% Check if the modality given is allowed.
+modalityAllowed = any(strcmpi(modality, ALLOWED_MODALITIES));
+if not(modalityAllowed)
+    error(INVALID_PARAM_ERROR, MODALITY_PARAM);
+end
 
-    svms = inputs.SVMs;
-    binary_histograms = inputs.BinaryHistograms;
-    lambda = inputs.Lambda;
-    solver = inputs.Solver;
-    loss = inputs.Loss;
-    verbose = inputs.Verbose;
+% Variables to improve code legibility.
+[nCategories, nSamplesPerCategory, nFeaturesPerSample] = ...
+    size(featuresCellArray);
+nSamples = nCategories * nSamplesPerCategory;
+nClasses = length(realClassLabelsCellArray);
 
-    % Variables to improve code legibility.
-    [num_categories, num_images_per_category, num_features_per_image] = size(features_3d);
-    num_images = num_categories * num_images_per_category;
-    num_classes = length(cell_real_labels);
+% Convert the samples features cell array into a standard 2D matrix with the 
+% samples by columns.
+featuresMatrix = cell2mat(cellfun(@(x) x', reshape(featuresCellArray',[],1), ...
+                          'UniformOutput', false))';
 
-    % Permute and reshape the features to fit the Support Vector Machine (SVM)
-    % requirements: one column per example.
-    features_2d = permute(features_3d, [3 2 1]);
-    features_2d = reshape(features_2d, [num_features_per_image, num_images]);
+% Use binary histograms if required.
+if shouldBinaryHistograms
+    featuresMatrix( find(featuresMatrix) ) = 1;
+end
 
-    % Use binary histograms if required.
-    if binary_histograms
-        features_2d( find(features_2d) ) = 1;
+if not(strcmpi(modality, TESTING_MODALITY))
+    % Cell structure: {'Class name', SVM weight vector (W), SVM bias (B)}.
+    svmsCellArray = cell(nClasses, 1);
+end
+
+% Cell array to store the estimated labels of the samples. The i,j cell contains
+% a column vectors where k element represents if jth sample of ith category
+% belongs to kth class (1 if it belongs, 0 otherwise). 
+estimatedLabelsCellArray = cell(nCategories, nSamplesPerCategory);
+
+% Matrix with the same meaning as the above cell array.
+estimatedLabelsMatrix = zeros(nCategories, nSamplesPerCategory, nClasses);
+
+% Cell array used to store the name of a class, the accuracy obtained in the 
+% classification process and its confusion matrix.
+% Structure: {'className', accuracy, confusionMatrix}.
+accuraciesCellArray = cell(nClasses, 1);
+
+% If the modality is test, use the given SVMs to classify the specified samples
+% feature vectors. Otherwise, use SVMs to create the linear classifiers.
+for iClass = 1:nClasses,
+    classCell = realClassLabelsCellArray{iClass};
+    className = classCell{1};
+    classRealBinaryLabels = reshape(classCell{2}', [], 1); % 0 or 1.
+
+    % Convert binary labels to -1 or 1 (SVMs requirement).
+    classRealLabels = classRealBinaryLabels;
+    classRealLabels( find(classRealBinaryLabels == 0) ) = -1; 
+
+    if strcmpi(modality, TESTING_MODALITY)
+        % Use the SVM linear classifiers to classify the test data.
+        % Cell structure: {'Class name', SVM weight vector (W), SVM bias (B)}.
+        W = svmsCellArray{iClass}{SMVS_CELL_ARRAY_WEIGHT_VECTOR_INDEX};
+        B = svmsCellArray{iClass}{SMVS_CELL_ARRAY_BIAS_INDEX};
+        scores = (W' * featuresMatrix) + B;
+    else
+        % Build the classifier for this class.
+        [W, B, ~, scores] = vl_svmtrain(featuresMatrix, classRealLabels,    ...
+                                        lambda, SOLVER_PARAM, solver,       ...
+                                                LOSS_PARAM, loss);
+
+        % Store everything in the cell data structure.
+        svmsCellArray{iClass} = cell(1, SMVS_CELL_ARRAY_NUM_ELEMENTS);
+        svmsCellArray{iClass}{SMVS_CELL_ARRAY_CLASS_NAME_INDEX} = className;
+        svmsCellArray{iClass}{SMVS_CELL_ARRAY_WEIGHT_VECTOR_INDEX} = W;
+        svmsCellArray{iClass}{SMVS_CELL_ARRAY_BIAS_INDEX} = B;
     end
 
-    if not(strcmp(modality, TEST))
-        % Cell array formed by cell arrays each with 3 elements: 
-        % {'Class name', SVM weight vector (W), SVM bias (B)}.
-        svms = cell(num_classes, 1);
+    % Elements with score 0 (on the line of the linear classifier) are
+    % the same as negative (don't belong to the class).
+    classEstimatedLabels = sign(scores);    % Returns -1, 0 or 1.
+    classEstimatedBinaryLabels = classEstimatedLabels;
+    classEstimatedBinaryLabels( find(classEstimatedLabels == -1) ) = 0;
+    
+    % Store the estimated labels of each sample using binary vectors.
+    estimatedLabelsMatrix(:,:,iClass) = reshape(classEstimatedBinaryLabels, ...
+                                        [nSamplesPerCategory, nCategories])'; 
+
+    % Compute the confusion matrix and the accuracy. Store them in a cell array.
+    confusionMatrix = accumarray([classRealBinaryLabels, ...
+                                 classEstimatedBinaryLabels']+1, 1) ./ nSamples;
+    accuracy = sum(diag(confusionMatrix));
+    accuraciesCellArray{iClass} = {className, accuracy, confusionMatrix};
+
+    if verbose >= 3
+        % Display confusion matrix for this class.
+        fprintf(STDOUT, '\n%s confusion:\n', className);
+        disp(confusionMatrix);
     end
+end
 
-    % 3D matrix to store the estimated labels of the images. The rows represent
-    % the categories, the columns the file names and the depth the labels with
-    % value 0 (it does not belong to this class) or 1 (it belongs to this class).
-    estimated_labels = zeros(num_categories, num_images_per_category, num_classes);
+% Convert the estimated labels matrix into a cell array with column vector 
+% cells.
+estimatedLabelsCellArray = mat2cell(estimatedLabelsMatrix, ...
+                                    ones(nCategories,1),   ...
+                                    ones(nSamplesPerCategory,1), nClasses);
+estimatedLabelsCellArray = cellfun(@(x) reshape(x, [], 1),   ...
+                                   estimatedLabelsCellArray, ...
+                                   'UniformOutput', false);
+keyboard;
+if verbose >= 1
+    % Print the resulting accuracies.
+    accuraciesArray = extractFromCell(accuraciesCellArray, 2);
+    fprintf(STDOUT, 'Mean accuracy: %.2f. ', mean(accuraciesArray) * 100);
+    %fprintf(STDOUT, '%s:\n', modality);
+    %fprintf(STDOUT, ' - Mean accuracy: %.2f\n', mean(accuraciesArray) * 100);
+    %fprintf(STDOUT, ' - Min accuracy: %.2f\n', min(accuraciesArray) * 100);
+    %fprintf(STDOUT, ' - Max accuracy: %.2f\n\n', max(accuraciesArray) * 100);
 
-    % Variables used to test the accuracy.
-    min_accuracy = 1;
-    max_accuracy = 0;
-    sum_of_accuracies = 0;
+    if verbose >= 2
+        % Plot chart of accuracies.
+        classNameCellArray = cellfun(@(x) x{1}, accuraciesCellArray, ...
+                                     'UniformOutput', false);
+        confusionsMatrix = extractFromCell(accuraciesCellArray, 3);
 
-    % If the modality is test, use the given SVMs to classify the specified 
-    % feature vectors. Otherwise, use SVMs to create the linear classifiers.
-    for i = 1:num_classes,
-        class_cell = cell_real_labels{i};
-        class_name = class_cell{1};
-        class_real_binary_labels = class_cell{2}; % 0 or 1.
+        figureName = 'Properties detection global accuracy';
+        xArray = accuraciesArray;
+        xLabelsCellArray = classNameCellArray;
+        color = 'r';
+        plotAccuraciesBarGraph(figureName, xArray, xLabelsCellArray, color);
 
-        % Convert binary labels to -1 or 1 (SVMs requirement).
-        class_real_labels = class_real_binary_labels;
-        class_real_labels( find(class_real_binary_labels == 0) ) = -1; 
 
-        if strcmp(modality, TEST)
-            % Use the SVM linear classifiers to classify the test data.
-            % Cell structure: {'Class name', SVM weight vector (W), SVM bias (B)}.
-            W = svms{i}{2};
-            B = svms{i}{3};
-            scores = (W' * features_2d) + B;
-        else
-            if not( strcmp(modality, TRAINING) )
-                fprintf(1, 'Wrong modality. Default execution.\n');
-            end
+        figureName = 'Properties detection accuracy detecting positives';
+        xArray = reshape(confusionsMatrix(2,2,:) ./ ...
+                    (confusionsMatrix(2,1,:) + confusionsMatrix(2,2,:)), [], 1);
+        xLabelsCellArray = classNameCellArray;
+        color = 'b';
+        plotAccuraciesBarGraph(figureName, xArray, xLabelsCellArray, color);
 
-            % Build the classifier for this class.
-            [W, B, ~, scores] = vl_svmtrain(features_2d, class_real_labels, lambda, SOLVER_PARAM, solver, LOSS_PARAM, loss);
 
-            % Store everything in the cell data structure.
-            svms{i} = {class_name, W, B};
-        end
+        [~,I] = sortrows(extractFromCell(accuraciesCellArray, 2));
+        sortedByAccuraciesCellArray = accuraciesCellArray(I);
+        sortedClassNameCellArray = cellfun(@(x) x{1},                   ...
+                                           sortedByAccuraciesCellArray, ...
+                                           'UniformOutput', false);
+        sortedAccuraciesArray = extractFromCell(sortedByAccuraciesCellArray, 2);
 
-        % Elements with score 0 (on the line of the linear classifier) are
-        % the same as negative (don't belong to the class).
-        class_est_labels = sign(scores); % Returns -1, 0 or 1, depending on sign.
-        class_est_binary_labels = class_est_labels;
-        class_est_binary_labels( find(class_est_labels == -1) ) = 0;
-        
-        % Store the estimated labels of each image using binary vectors.
-        estimated_labels(:,:,i) = reshape(class_est_binary_labels, ...
-            [num_images_per_category, num_categories])'; 
+        figureName = 'Properties detection sorted by global accuracy';
+        xArray = sortedAccuraciesArray;
+        xLabelsCellArray = sortedClassNameCellArray;
+        color = 'r';
+        plotAccuraciesBarGraph(figureName, xArray, xLabelsCellArray, color);
 
-        % Computing accuracy in the classification process.
-        correct = sum(class_real_binary_labels == sign(class_est_binary_labels'));
-        accuracy = correct / length(class_est_binary_labels);
 
-        sum_of_accuracies = sum_of_accuracies + accuracy;
-        min_accuracy = min(min_accuracy, accuracy);
-        max_accuracy = max(max_accuracy, accuracy);
-    end
+        [sortedPositiveAccuraciesArray,I] = sortrows(cellfun(@(x) ...
+            x{3}(2,2,:)./(x{3}(2,1,:)+x{3}(2,2,:)), accuraciesCellArray));
+        sortedByPositiveAccuraciesCellArray = accuraciesCellArray(I);
+        sortedPositiveClassNameCellArray = cellfun(@(x) x{1},                ...
+                                        sortedByPositiveAccuraciesCellArray, ...
+                                        'UniformOutput', false);
 
-    if verbose >= 1
-        % Print the resulting accuracies.
-        mean_accuracy = (sum_of_accuracies / num_classes);
-        fprintf(1, 'Mean accuracy: %.2f. ', mean_accuracy * 100);
-        %fprintf(1, '%s:\n', modality);
-        %fprintf(1, ' - Mean accuracy: %.2f\n', mean_accuracy * 100);
-        %fprintf(1, ' - Min accuracy: %.2f\n', min_accuracy * 100);
-        %fprintf(1, ' - Max accuracy: %.2f\n\n', max_accuracy * 100);
+        figureName = 'Properties detection sorted accuracy detecting positives';
+        xArray = sortedPositiveAccuraciesArray;
+        xLabelsCellArray = sortedPositiveClassNameCellArray;
+        color = 'b';
+        plotAccuraciesBarGraph(figureName, xArray, xLabelsCellArray, color);
+
     end
 end
