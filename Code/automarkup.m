@@ -48,9 +48,19 @@ nClasses = length(CLASSES_CELL_ARRAY);
 nSamplesPerClass = length(SAMPLE_FILENAMES_CELL_ARRAY);
 nSamples = nClasses * nSamplesPerClass;
 
-% Read markup file and store the features in a cell array.
+% Read markup file and store the properties in a cell array.
 propertiesCellArray = readFeatures(MARKUP_FILE, nClasses, nSamplesPerClass);
 nProperties = length(propertiesCellArray);
+
+% Display the file names of the sample images with every property if required.
+if VERBOSE >= 2
+    for iProperty = 1:nProperties,
+        disp(propertiesCellArray{iProperty}{1});
+        [J,I] = find(propertiesCellArray{iProperty}{2}');
+        disp(strcat(IMAGES_ROOT_PATH, '/', CLASSES_CELL_ARRAY(I)', '/', ...
+                   SAMPLE_FILENAMES_CELL_ARRAY(J)', '.', SAMPLE_IMAGES_FORMAT));
+    end
+end
 
 % --------------------------------------------------------------------------- %
 

@@ -1,0 +1,734 @@
+\documentclass[12pt,a4paper]{article}
+% Change "article" to "report" to get rid of page number on title page
+\usepackage{amsmath,mathtools,amsfonts,amsthm,amssymb}
+\usepackage{setspace}
+\usepackage{Tabbing}
+\usepackage{cite}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{extramarks}
+\usepackage{chngpage}
+\usepackage{fourier}
+\usepackage{soul,color}
+\usepackage[usenames,dvipsnames]{xcolor}
+\usepackage{graphicx,float,wrapfig}
+\usepackage[utf8]{inputenc}
+\usepackage{sidecap}
+\usepackage{marvosym}
+\usepackage{tikz, tikz-qtree}
+\usepackage{tabularx, multirow}
+\usepackage{enumerate}
+\usepackage{hyperref}
+\usepackage{cleveref}
+\usepackage{zref}
+\definecolor{gray99}{gray}{.99}
+\usepackage{listings}
+\usepackage[english]{babel}
+\usepackage{placeins}
+\usepackage{tikz}
+\usepackage{tikz-qtree}
+\usepackage{xspace}
+\usepackage{mathtools}
+\usepackage{tabulary}
+\lstset{
+	language=Matlab,
+	backgroundcolor=\color{gray99},
+	tabsize=3,
+	frame=single,
+	keywordstyle=\ttfamily\bfseries\color{RoyalBlue},
+	commentstyle=\ttfamily\color{ForestGreen},
+	stringstyle=\ttfamily\color{Gray},
+	breaklines=true,
+	showstringspaces=false,
+	basicstyle=\small\ttfamily,
+	emph={label},
+	xleftmargin=22pt,
+	framexleftmargin=22pt,
+	framexrightmargin=0pt,
+	framexbottommargin=4pt,
+	numbers=left,
+	stepnumber=1
+}
+\usepackage{caption}
+\DeclareCaptionFont{black}{\color{black}}{\bfseries}
+\DeclareCaptionFormat{listing}{\parbox{\textwidth}{\hspace{8pt}#1#2#3}}
+\captionsetup[lstlisting]{format=listing,labelfont=black,textfont=black, singlelinecheck=false, margin=0pt, font={bf,footnotesize}}
+
+% In case you need to adjust margins:
+\topmargin=-0.45in      %
+\evensidemargin=0in     %
+\oddsidemargin=0in      %
+\textwidth=6.5in        %
+\textheight=9.5in       %
+\headsep=0.25in         %
+
+% Homework Specific Information
+\newcommand{\hmwkTopic}{Material dataset markup}
+\newcommand{\hmwkTitle}{\hmwkTopic}
+\newcommand{\hmwkDueDate}{\today}
+\newcommand{\hmwkClass}{CS 499}
+\newcommand{\hmwkAuthorNameA}{José Vicente Ruiz Cepeda}
+\newcommand{\hmwkAuthorEmailA}{ruizcep2@illinois.edu}
+
+% Setup the header and footer
+\pagestyle{fancy}                                                       %
+\lhead{\hmwkAuthorNameA}                                                 %
+\chead{\hmwkClass}  %
+\rhead{\hmwkTopic}     
+                                                %
+\lfoot{}                                                %
+\cfoot{\hyperlink{toc}{\thepage}}%
+\rfoot{}                          %
+
+\renewcommand\headrulewidth{0.4pt}                                      %
+\renewcommand\footrulewidth{0.4pt}                                      %
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Make title
+\title{\vspace{2in}\textmd{\hmwkClass\\\textbf{\hmwkTitle}}\\\normalsize\vspace{0.1in}\small{\hmwkDueDate}\\\vspace{4in}}
+\date{}
+\author{\textbf{\hmwkAuthorNameA} \\<\texttt{\href{mailto:ruizcep2@illinois.edu}{\hmwkAuthorEmailA}}>}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+\begin{singlespace}
+
+\begin{titlepage}
+\maketitle
+\thispagestyle{empty}
+\end{titlepage}
+
+% Uncomment the \tableofcontents and \newpage lines to get a Contents page
+% Uncomment the \setcounter line as well if you do NOT want subsections
+%       listed in Contents
+%\setcounter{tocdepth}{1}
+\hypertarget{toc}{}
+\tableofcontents
+\newpage
+
+% When problems are long, it may be desirable to put a \newpage or a
+% \clearpage before each homeworkProblem environment
+
+
+\clearpage
+
+% Own commands:
+\newcommand{\e}[1]{\emph{#1}\xspace}
+\crefformat{footnote}{#2\footnotemark[#1]#3} 	% Required for footnotes with href.
+
+%%%%%%%%
+\section{Introduction}
+This first assignment consists on the markup of a material dataset with several properties. The dataset comes from\cite{Liao_2013_CVPR} and is composed of eighteen material categories, each one with twelve different sample images in \texttt{PNG} format with resolutions lower than 400 x 400 pixels.
+
+%%%%%%%%
+\section{Methodology}
+The procedure to mark each of the material images consists on defining its shape and touch for the \e{fine}, \e{medium} and \e{coarse} scale, being its possible values the following ones:
+
+% Define commands to easy the classfication. First letter property, second and third letters value.
+\newcommand{\Fine}{\textbf{Fine}}
+\newcommand{\Medium}{\textbf{Medium}}
+\newcommand{\Coarse}{\textbf{Coarse}}
+
+\newcommand{\sfl}{\e{flat}}
+\newcommand{\sro}{\e{round}}
+\newcommand{\sexor}{\e{extended organized}}
+\newcommand{\sexdi}{\e{extended disorganized}}
+
+\newcommand{\tfu}{\e{furry}} 
+\newcommand{\tfe}{\e{feathery}} 
+\newcommand{\tco}{\e{coarse}} 
+\newcommand{\tro}{\e{rough}} 
+\newcommand{\tbu}{\e{bumpy}} 
+\newcommand{\tsc}{\e{scratchy}} 
+\newcommand{\tsm}{\e{smooth}} 
+\newcommand{\tve}{\e{velvety}}
+
+\begin{itemize}
+	\item \textbf{Shape}: \sfl\footnote{\label{new}New value.}, \sro, \sexor and \sexdi.
+	\item \textbf{Touch}: \tfu, \tfe, \tco, \tro\cref{new}, \tbu, \tsc, \tsm and \tve\cref{new}.
+\end{itemize}
+
+%%%%%%%%
+\section{Markup}
+
+% Markup commands.
+\newcommand{\imageSize}{0.30}
+\newcommand{\dataSize}{0.65}
+\newcommand{\spaceSize}{0.02}
+
+\newcommand{\mat}{Birch}
+\newcommand{\Number}{01}
+\newcommand{\InputImage}[8]{
+\begin{figure}[!ht]
+    \centering
+    \begin{minipage}{\imageSize\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{../../Dataset/\mat/\Number.png}
+    \end{minipage}
+    \hspace{\spaceSize\textwidth}
+    \begin{minipage}{\dataSize\textwidth}
+        \textbf{\large \mat \xspace \Number}:
+
+        #7
+        \begin{itemize}
+            \item \Fine: #1, #2.
+            \item \Medium: #3, #4.
+            \item \Coarse: #5, #6.
+        \end{itemize}
+        #8
+    \end{minipage}
+\end{figure}
+\FloatBarrier    
+}
+
+%%%
+\renewcommand{\mat}{Birch}
+\subsection{\mat}
+Coarse scale is considered the picture itself, while medium scale is a part where the horizontal pattern is not present, and fine scale a little spot in the medium scale.
+
+\renewcommand{\Number}{01}\InputImage{\sfl}{\tco}{\sexdi}{\tsc}{\sexor}{\tsc}
+{}{}
+\renewcommand{\Number}{02}\InputImage{\sfl}{\tco}{\sfl}{\tco}{\sexdi}{\tsc}
+{}{}
+\renewcommand{\Number}{03}\InputImage{\sfl}{\tco}{\sexor}{\tsc}{\sexor}{\tsc}
+{}{}
+\renewcommand{\Number}{04}\InputImage{\sfl}{\tco}{\sexor}{\tsc}{\sro}{\tco}
+{Watermark and big crack.}{}
+\renewcommand{\Number}{05}\InputImage{\sfl}{\tco}{\sfl}{\tco}{\sexor}{\tsc}
+{}{Considering for the medium scale the part without horizontal lines.}
+\renewcommand{\Number}{06}\InputImage{\sfl}{\tco}{\sexor}{\tsc}{\sexor}{\tsc}
+{}{}
+\renewcommand{\Number}{07}\InputImage{\sfl}{\tco}{\sexor}{\tco}{\sexor}{\tco}
+{}{}
+\renewcommand{\Number}{08}\InputImage{\sfl}{\tco}{\sexor}{\tsc}{\sexor}{\tsc}
+{Watermark.}{}
+\renewcommand{\Number}{09}\InputImage{\sfl}{\tco}{\sexor}{\tsc}{\sexdi}{\tsc}
+{}{}
+\renewcommand{\Number}{10}\InputImage{\sfl}{\tco}{\sexor}{\tsc}{\sexor}{\tsc}
+{}{}
+\renewcommand{\Number}{11}\InputImage{\sfl}{\tco}{\sexor}{\tsc}{\sro}{\tsc}
+{Big crack.}{}
+\renewcommand{\Number}{12}\InputImage{\sfl}{\tco}{\sexor}{\tsc}{\sexor}{\tsc}
+{}{}
+
+%%%
+\clearpage
+\renewcommand{\mat}{Brick}
+\subsection{\mat}
+
+\renewcommand{\Number}{01}\InputImage{\sfl}{\tco}{\sexor}{\tco}{\sexor}{\tco}
+{}{}
+\renewcommand{\Number}{02}\InputImage{\sfl}{\tsc}{\sexor}{\tco}{\sexor}{\tco}
+{}{Considering as fine scale the mortar.}
+\renewcommand{\Number}{03}\InputImage{\sfl}{\tsc}{\sfl}{\tco}{\sexor}{\tsc}
+{}{Considering as fine scale the mortar.}
+\renewcommand{\Number}{04}\InputImage{\sfl}{\tco}{\sexor}{\tco}{\sexor}{\tco}
+{}{}
+\renewcommand{\Number}{05}\InputImage{\sfl}{\tco}{\sexor}{\tco}{\sexor}{\tco}
+{}{Might also be considered bumpy at coarse and medium scale?}
+\renewcommand{\Number}{06}\InputImage{\sfl}{\tco}{\sexor}{\tsm}{\sexor}{\tsm}
+{Graffiti.}{Considering as fine scale the mortar.}
+\renewcommand{\Number}{07}\InputImage{\sfl}{\tco}{\sexor}{\tco}{\sexor}{\tco}
+{}{}
+\renewcommand{\Number}{08}\InputImage{\sfl}{\tco}{\sexor}{\tbu}{\sexor}{\tbu}
+{}{}
+\renewcommand{\Number}{09}\InputImage{\sfl}{\tco}{\sexor}{\tco}{\sexor}{\tco}
+{}{}
+\renewcommand{\Number}{10}\InputImage{\sfl}{\tsc}{\sexor}{\tco}{\sexor}{\tco}
+{}{Considering as fine scale the mortar.}
+\renewcommand{\Number}{11}\InputImage{\sexor}{\tco}{\sexor}{\tco}{\sexor}{\tco}
+{}{}
+\renewcommand{\Number}{12}\InputImage{\sfl}{\tsm}{\sexor}{\tsm}{\sexor}{\tbu}
+{}{}
+
+%%%
+\clearpage
+\renewcommand{\mat}{Concrete}
+\subsection{\mat}
+
+\renewcommand{\Number}{01}\InputImage{\sfl}{\tco}{\sfl}{\tco}{\sfl}{\tco}
+{}{}
+\renewcommand{\Number}{02}\InputImage{\sfl}{\tco}{\sfl}{\tco}{\sexdi}{\tco}
+{}{}
+\renewcommand{\Number}{03}\InputImage{\sfl}{\tco}{\sfl}{\tco}{\sexdi}{\tbu}
+{}{}
+\renewcommand{\Number}{04}\InputImage{\sfl}{\tsc}{\sfl}{\tsc}{\sfl}{\tsc}
+{}{}
+\renewcommand{\Number}{05}\InputImage{\sfl}{\tco}{\sfl}{\tco}{\sexor}{\tco}
+{}{}
+\renewcommand{\Number}{06}\InputImage{\sfl}{\tco}{\sfl}{\tco}{\sexor}{\tco}
+{}{Considering that the almost straight break is organized.}
+\renewcommand{\Number}{07}\InputImage{\sfl}{\tco}{\sfl}{\tco}{\sro}{\tsc}
+{}{Considering the spots of different colours to determine a round shape.}
+\renewcommand{\Number}{08}\InputImage{\sfl}{\tco}{\sfl}{\tco}{\sfl}{\tco}
+{}{Considering that the patterns in the middle of the image don't affect the shape.}
+\renewcommand{\Number}{09}\InputImage{\sfl}{\tco}{\sfl}{\tco}{\sfl}{\tco}
+{}{}
+\renewcommand{\Number}{10}\InputImage{\sfl}{\tco}{\sfl}{\tco}{\sexdi}{\tco}
+{}{}
+\renewcommand{\Number}{11}\InputImage{\sfl}{\tco}{\sfl}{\tsc}{\sfl}{\tsc}
+{}{}
+\renewcommand{\Number}{12}\InputImage{\sfl}{\tsc}{\sfl}{\tsc}{\sfl}{\tsc}
+{}{}
+
+%%%
+\clearpage
+\renewcommand{\mat}{Corduroy}
+\subsection{\mat}
+
+\renewcommand{\Number}{01}\InputImage{\sexor}{\tsm}{\sexor}{\tsm}{\sexor}{\tbu}
+{Logo in the right bottom corner.}{}
+\renewcommand{\Number}{02}\InputImage{\sfl}{\tve}{\sexor}{\tbu}{\sexdi}{\tbu}
+{}{Considering that the perpendicular direction of the lines makes them disorganized.}
+\renewcommand{\Number}{03}\InputImage{\sfl}{\tsm}{\sexor}{\tbu}{\sexdi}{\tbu}
+{}{}
+\renewcommand{\Number}{04}\InputImage{\sfl}{\tsm}{\sexor}{\tbu}{\sexdi}{\tbu}
+{}{}
+\renewcommand{\Number}{05}\InputImage{\sfl}{\tve}{\sexor}{\tbu}{\sexdi}{\tbu}
+{}{}
+\renewcommand{\Number}{06}\InputImage{\sfl}{\tve}{\sexor}{\tbu}{\sro}{\tbu}
+{}{Considering the buttons as part of the course scale.}
+\renewcommand{\Number}{07}\InputImage{\sfl}{\tve}{\sexor}{\tbu}{\sexor}{\tbu}
+{}{}
+\renewcommand{\Number}{08}\InputImage{\sfl}{\tve}{\sexor}{\tbu}{\sexor}{\tbu}
+{Logo in the bottom left corner.}{}
+\renewcommand{\Number}{09}\InputImage{\sfl}{\tve}{\sexor}{\tbu}{\sexor}{\tbu}
+{}{}
+\renewcommand{\Number}{10}\InputImage{\sexor}{\tbu}{\sexor}{\tbu}{\sro}{\tbu}
+{}{Considering the figures of the bottom left corner for the coarse scale.}
+\renewcommand{\Number}{11}\InputImage{\sfl}{\tve}{\sexor}{\tbu}{\sexor}{\tbu}
+{}{}
+\renewcommand{\Number}{12}\InputImage{\sexor}{\tbu}{\sexor}{\tbu}{\sro}{\tbu}
+{}{Considering the flower for the coarse scale.}
+
+%%%
+\clearpage
+\renewcommand{\mat}{Denim}
+\subsection{\mat}
+
+\renewcommand{\Number}{01}\InputImage{\sexor}{\tsm}{\sexor}{\tsm}{\sexor}{\tsm}
+{}{}
+\renewcommand{\Number}{02}\InputImage{\sexor}{\tsm}{\sexor}{\tsm}{\sexor}{\tsm}
+{}{}
+\renewcommand{\Number}{03}\InputImage{\sexor}{\tsm}{\sexor}{\tsm}{\sexdi}{\tbu}
+{}{}
+\renewcommand{\Number}{04}\InputImage{\sexor}{\tsm}{\sexor}{\tsm}{\sexdi}{\tbu}
+{}{}
+\renewcommand{\Number}{05}\InputImage{\sexor}{\tsm}{\sexor}{\tsm}{\sexor}{\tsm}
+{}{}
+\renewcommand{\Number}{06}\InputImage{\sro}{\tsm}{\sro}{\tsm}{\sro}{\tsm}
+{}{}
+\renewcommand{\Number}{07}\InputImage{\sexor}{\tsm}{\sexor}{\tsm}{\sexdi}{\tsm}
+{}{}
+\renewcommand{\Number}{08}\InputImage{\sexor}{\tsm}{\sexor}{\tsm}{\sexor}{\tsm}
+{Watermark.}{}
+\renewcommand{\Number}{09}\InputImage{\sro}{\tsm}{\sro}{\tsm}{\sro}{\tsm}
+{}{}
+\renewcommand{\Number}{10}\InputImage{\sexor}{\tsm}{\sexor}{\tsm}{\sexdi}{\tbu}
+{}{}
+\renewcommand{\Number}{11}\InputImage{\sro}{\tsm}{\sro}{\tsm}{\sro}{\tbu}
+{}{}
+\renewcommand{\Number}{12}\InputImage{\sro}{\tsm}{\sro}{\tsm}{\sro}{\tbu}
+{}{}
+
+%%%
+\clearpage
+\renewcommand{\mat}{Elm}
+\subsection{\mat}
+
+\renewcommand{\Number}{01}\InputImage{\sfl}{\tco}{\sexdi}{\tbu}{\sexdi}{\tbu}
+{}{Considering the bark to be disorganized.}
+\renewcommand{\Number}{02}\InputImage{\sfl}{\tco}{\sro}{\tbu}{\sro}{\tbu}
+{}{}
+\renewcommand{\Number}{03}\InputImage{\sfl}{\tco}{\sexdi}{\tbu}{\sexdi}{\tbu}
+{}{}
+\renewcommand{\Number}{04}\InputImage{\sfl}{\tco}{\sexdi}{\tbu}{\sexdi}{\tbu}
+{}{}
+\renewcommand{\Number}{05}\InputImage{\sfl}{\tco}{\sexdi}{\tbu}{\sexdi}{\tbu}
+{}{}
+\renewcommand{\Number}{06}\InputImage{\sfl}{\tco}{\sexor}{\tbu}{\sexor}{\tbu}
+{}{Considering the bark as organized.}
+\renewcommand{\Number}{07}\InputImage{\sfl}{\tco}{\sexdi}{\tbu}{\sexdi}{\tbu}
+{}{}
+\renewcommand{\Number}{08}\InputImage{\sfl}{\tco}{\sexdi}{\tbu}{\sexdi}{\tbu}
+{}{}
+\renewcommand{\Number}{09}\InputImage{\sfl}{\tco}{\sexdi}{\tbu}{\sexdi}{\tbu}
+{}{}
+\renewcommand{\Number}{10}\InputImage{\sfl}{\tco}{\sfl}{\tco}{\sexdi}{\tbu}
+{}{}
+\renewcommand{\Number}{11}\InputImage{\sfl}{\tco}{\sexdi}{\tbu}{\sexdi}{\tbu}
+{Extremely low quality image.}{}
+\renewcommand{\Number}{12}\InputImage{\sfl}{\tco}{\sro}{\tbu}{\sro}{\tbu}
+{}{}
+
+%%%
+\clearpage
+\renewcommand{\mat}{Feathers}
+\subsection{\mat}
+
+\renewcommand{\Number}{01}\InputImage{\sexor}{\tbu}{\sexor}{\tbu}{\sro}{\tfe}
+{Watermark.}{}
+\renewcommand{\Number}{02}\InputImage{\sexor}{\tbu}{\sexor}{\tbu}{\sro}{\tfe} 
+{}{}
+\renewcommand{\Number}{03}\InputImage{\sexor}{\tbu}{\sexor}{\tbu}{\sro}{\tfe} 
+{}{}
+\renewcommand{\Number}{04}\InputImage{\sexor}{\tbu}{\sexor}{\tbu}{\sexdi}{\tfe}
+{}{}
+\renewcommand{\Number}{05}\InputImage{\sexor}{\tbu}{\sro}{\tfe}{\sro}{\tfe}
+{Watermark.}{}
+\renewcommand{\Number}{06}\InputImage{\sfl}{\tsm}{\sro}{\tfe}{\sro}{\tfe}
+{}{}
+\renewcommand{\Number}{07}\InputImage{\sexor}{\tbu}{\sexdi}{\tfe}{\sexdi}{\tfe}
+{}{}
+\renewcommand{\Number}{08}\InputImage{\sexor}{\tbu}{\sexor}{\tbu}{\sexdi}{\tfe}
+{}{}
+\renewcommand{\Number}{09}\InputImage{\sexor}{\tbu}{\sexor}{\tbu}{\sexdi}{\tfe}
+{}{}
+\renewcommand{\Number}{10}\InputImage{\sfl}{\tsm}{\sro}{\tfe}{\sro}{\tfe}
+{}{Considering the wing for the medium scale.}
+\renewcommand{\Number}{11}\InputImage{\sexor}{\tbu}{\sexor}{\tfe}{\sexor}{\tfe}
+{}{}
+\renewcommand{\Number}{12}\InputImage{\sexor}{\tbu}{\sro}{\tfe}{\sro}{\tfe}
+{}{}
+
+%%%
+\clearpage
+\renewcommand{\mat}{Fur}
+\subsection{\mat}
+Considering that the pattern that follows the fur is, at least, at low scale, organized.
+
+\renewcommand{\Number}{01}\InputImage{\sexor}{\tfu}{\sexor}{\tfu}{\sexdi}{\tfu}
+{Watermark.}{}
+\renewcommand{\Number}{02}\InputImage{\sexor}{\tfu}{\sexor}{\tfu}{\sexdi}{\tfu}
+{}{}
+\renewcommand{\Number}{03}\InputImage{\sexor}{\tfu}{\sexor}{\tfu}{\sro}{\tfu}
+{}{Considering the spots as elements of round shape.}
+\renewcommand{\Number}{04}\InputImage{\sexor}{\tfu}{\sexor}{\tfu}{\sexor}{\tfu}
+{}{}
+\renewcommand{\Number}{05}\InputImage{\sexor}{\tfu}{\sexor}{\tfu}{\sexdi}{\tfu}
+{}{}
+\renewcommand{\Number}{06}\InputImage{\sexor}{\tfu}{\sexor}{\tfu}{\sexdi}{\tfu}
+{}{}
+\renewcommand{\Number}{07}\InputImage{\sexor}{\tfu}{\sexdi}{\tfu}{\sexdi}{\tfu}
+{}{}
+\renewcommand{\Number}{08}\InputImage{\sexor}{\tfu}{\sexor}{\tfu}{\sexdi}{\tfu}
+{}{}
+\renewcommand{\Number}{09}\InputImage{\sexor}{\tfu}{\sexdi}{\tfu}{\sexdi}{\tfu}
+{}{}
+\renewcommand{\Number}{10}\InputImage{\sexor}{\tfu}{\sexor}{\tfu}{\sexdi}{\tfu}
+{}{}
+\renewcommand{\Number}{11}\InputImage{\sexor}{\tfu}{\sexor}{\tfu}{\sro}{\tfu}
+{Same as Fur 03 with different color.}{}
+\renewcommand{\Number}{12}\InputImage{\sexor}{\tfu}{\sexor}{\tfu}{\sexdi}{\tfu}
+{}{}
+
+%%%
+\clearpage
+\renewcommand{\mat}{Hair}
+\subsection{\mat}
+Considering that the touch of hair is smooth at a high scale.
+
+\renewcommand{\Number}{01}\InputImage{\sexor}{\tbu}{\sexor}{\tsm}{\sexdi}{\tsm}
+{Watermark.}{}
+\renewcommand{\Number}{02}\InputImage{\sexor}{\tbu}{\sexdi}{\tsm}{\sexdi}{\tsm}
+{Watermark.}{}
+\renewcommand{\Number}{03}\InputImage{\sexor}{\tbu}{\sexor}{\tsm}{\sexdi}{\tsm}
+{}{}
+\renewcommand{\Number}{04}\InputImage{\sexor}{\tbu}{\sexor}{\tsm}{\sexdi}{\tsm}
+{}{}
+\renewcommand{\Number}{05}\InputImage{\sexor}{\tbu}{\sexor}{\tsm}{\sexor}{\tsm}
+{}{}
+\renewcommand{\Number}{06}\InputImage{\sexor}{\tbu}{\sexor}{\tsm}{\sexor}{\tsm}
+{}{}
+\renewcommand{\Number}{07}\InputImage{\sexor}{\tbu}{\sexor}{\tsm}{\sexdi}{\tsm}
+{}{}
+\renewcommand{\Number}{08}\InputImage{\sexor}{\tbu}{\sexdi}{\tsm}{\sexdi}{\tsm}
+{}{}
+\renewcommand{\Number}{09}\InputImage{\sexor}{\tbu}{\sexor}{\tsm}{\sexdi}{\tsm}
+{}{}
+\renewcommand{\Number}{10}\InputImage{\sexor}{\tbu}{\sexor}{\tsm}{\sexdi}{\tsm}
+{Watermark.}{}
+\renewcommand{\Number}{11}\InputImage{\sexor}{\tbu}{\sexor}{\tsm}{\sexor}{\tsm}
+{}{}
+\renewcommand{\Number}{12}\InputImage{\sexor}{\tbu}{\sexor}{\tsm}{\sexdi}{\tsm}
+{}{}
+
+%%%
+\clearpage
+\renewcommand{\mat}{KnitAran}
+\subsection{\mat}
+Considering that non-linear patterns are disorganized.
+
+\renewcommand{\Number}{01}\InputImage{\sexor}{\tco}{\sexdi}{\tbu}{\sexdi}{\tbu}
+{}{}
+\renewcommand{\Number}{02}\InputImage{\sexdi}{\tco}{\sexdi}{\tbu}{\sexdi}{\tbu}
+{}{}
+\renewcommand{\Number}{03}\InputImage{\sexor}{\tco}{\sexdi}{\tbu}{\sexdi}{\tbu}
+{}{Considering that the round parts of the pattern are extended disorganized.}
+\renewcommand{\Number}{04}\InputImage{\sexor}{\tco}{\sexdi}{\tbu}{\sro}{\tbu}
+{}{Considering the buttons at the coarse level.}
+\renewcommand{\Number}{05}\InputImage{\sexor}{\tco}{\sexdi}{\tbu}{\sro}{\tbu}
+{}{}
+\renewcommand{\Number}{06}\InputImage{\sexor}{\tco}{\sexdi}{\tbu}{\sro}{\tbu}
+{}{}
+\renewcommand{\Number}{07}\InputImage{\sexor}{\tco}{\sexor}{\tco}{\sexdi}{\tbu}
+{}{}
+\renewcommand{\Number}{08}\InputImage{\sexdi}{\tco}{\sexdi}{\tco}{\sexdi}{\tbu}
+{}{}
+\renewcommand{\Number}{09}\InputImage{\sexor}{\tco}{\sexdi}{\tbu}{\sexdi}{\tbu}
+{}{}
+\renewcommand{\Number}{10}\InputImage{\sexor}{\tco}{\sexor}{\tco}{\sexdi}{\tbu}
+{}{}
+\renewcommand{\Number}{11}\InputImage{\sexor}{\tco}{\sexdi}{\tbu}{\sro}{\tbu}
+{}{Considering the buttons at the coarse level.}
+\renewcommand{\Number}{12}\InputImage{\sexor}{\tco}{\sexdi}{\tbu}{\sexdi}{\tbu}
+{}{}
+
+%%%
+\clearpage
+\renewcommand{\mat}{KnitGuernsey}
+\subsection{\mat}
+Considering that non-linear patterns are disorganized.
+
+\renewcommand{\Number}{01}\InputImage{\sexor}{\tco}{\sexor}{\tco}{\sexdi}{\tbu}
+{}{}
+\renewcommand{\Number}{02}\InputImage{\sexor}{\tco}{\sexor}{\tco}{\sexdi}{\tco}
+{}{Ignoring the table behind.}
+\renewcommand{\Number}{03}\InputImage{\sro}{\tco}{\sro}{\tco}{\sexdi}{\tbu}
+{}{}
+\renewcommand{\Number}{04}\InputImage{\sro}{\tco}{\sro}{\tco}{\sexor}{\tbu}
+{}{}
+\renewcommand{\Number}{05}\InputImage{\sexor}{\tco}{\sexor}{\tco}{\sexdi}{\tbu}
+{}{}
+\renewcommand{\Number}{06}\InputImage{\sexdi}{\tco}{\sexdi}{\tco}{\sexdi}{\tbu}
+{}{}
+\renewcommand{\Number}{07}\InputImage{\sro}{\tco}{\sexdi}{\tco}{\sexdi}{\tbu}
+{}{}
+\renewcommand{\Number}{08}\InputImage{\sexor}{\tco}{\sexor}{\tco}{\sexdi}{\tbu}
+{}{}
+\renewcommand{\Number}{09}\InputImage{\sro}{\tco}{\sro}{\tco}{\sexdi}{\tbu}
+{}{}
+\renewcommand{\Number}{10}\InputImage{\sro}{\tco}{\sro}{\tco}{\sexdi}{\tbu}
+{}{}
+\renewcommand{\Number}{11}\InputImage{\sro}{\tco}{\sro}{\tco}{\sexdi}{\tbu}
+{}{}
+\renewcommand{\Number}{12}\InputImage{\sro}{\tco}{\sexdi}{\tco}{\sexdi}{\tbu}
+{}{}
+
+%%%
+\clearpage
+\renewcommand{\mat}{Leather}
+\subsection{\mat}
+
+\renewcommand{\Number}{01}\InputImage{\sro}{\tsm}{\sro}{\tbu}{\sro}{\tbu}
+{}{}
+\renewcommand{\Number}{02}\InputImage{\sro}{\tsm}{\sro}{\tbu}{\sro}{\tbu}
+{}{}
+\renewcommand{\Number}{03}\InputImage{\sro}{\tco}{\sro}{\tbu}{\sro}{\tbu}
+{}{}
+\renewcommand{\Number}{04}\InputImage{\sro}{\tsm}{\sro}{\tbu}{\sro}{\tbu}
+{}{}
+\renewcommand{\Number}{05}\InputImage{\sro}{\tsm}{\sro}{\tbu}{\sro}{\tbu}
+{}{Same as leather 04.}
+\renewcommand{\Number}{06}\InputImage{\sro}{\tsm}{\sro}{\tbu}{\sro}{\tbu}
+{}{}
+\renewcommand{\Number}{07}\InputImage{\sro}{\tsm}{\sro}{\tbu}{\sro}{\tbu}
+{}{}
+\renewcommand{\Number}{08}\InputImage{\sro}{\tsm}{\sro}{\tbu}{\sro}{\tbu}
+{}{}
+\renewcommand{\Number}{09}\InputImage{\sro}{\tsm}{\sro}{\tbu}{\sro}{\tbu}
+{}{}
+\renewcommand{\Number}{10}\InputImage{\sro}{\tsm}{\sro}{\tbu}{\sro}{\tbu}
+{}{}
+\renewcommand{\Number}{11}\InputImage{\sro}{\tsm}{\sro}{\tbu}{\sexor}{\tbu}
+{}{}
+\renewcommand{\Number}{12}\InputImage{\sro}{\tco}{\sro}{\tbu}{\sro}{\tbu}
+{}{}
+
+%%%
+\clearpage
+\renewcommand{\mat}{Marble}
+\subsection{\mat}
+
+\renewcommand{\Number}{01}\InputImage{\sfl}{\tsm}{\sexdi}{\tsm}{\sexdi}{\tsm}
+{}{}
+\renewcommand{\Number}{02}\InputImage{\sfl}{\tsm}{\sexdi}{\tsm}{\sexdi}{\tsm}
+{}{}
+\renewcommand{\Number}{03}\InputImage{\sfl}{\tco}{\sfl}{\tco}{\sexdi}{\tco}
+{}{}
+\renewcommand{\Number}{04}\InputImage{\sfl}{\tco}{\sexdi}{\tco}{\sexdi}{\tco}
+{}{}
+\renewcommand{\Number}{05}\InputImage{\sfl}{\tsm}{\sexdi}{\tco}{\sexdi}{\tco}
+{}{}
+\renewcommand{\Number}{06}\InputImage{\sexdi}{\tco}{\sexdi}{\tco}{\sexdi}{\tco}
+{}{}
+\renewcommand{\Number}{07}\InputImage{\sexdi}{\tco}{\sexdi}{\tco}{\sexdi}{\tco}
+{}{}
+\renewcommand{\Number}{08}\InputImage{\sexdi}{\tsm}{\sexdi}{\tsm}{\sexdi}{\tsm}
+{}{}
+\renewcommand{\Number}{09}\InputImage{\sro}{\tsm}{\sro}{\tsm}{\sro}{\tsm}
+{}{}
+\renewcommand{\Number}{10}\InputImage{\sfl}{\tsm}{\sexdi}{\tsm}{\sro}{\tsm}
+{}{}
+\renewcommand{\Number}{11}\InputImage{\sro}{\tco}{\sro}{\tco}{\sro}{\tco}
+{}{}
+\renewcommand{\Number}{12}\InputImage{\sfl}{\tsm}{\sexdi}{\tsm}{\sexdi}{\tsm}
+{}{}
+
+%%%
+\clearpage
+\renewcommand{\mat}{Scale}
+\subsection{\mat}
+
+\renewcommand{\Number}{01}\InputImage{\sfl}{\tsm}{\sro}{\tbu}{\sro}{\tbu}
+{}{}
+\renewcommand{\Number}{02}\InputImage{\sfl}{\tco}{\sro}{\tbu}{\sro}{\tbu}
+{}{}
+\renewcommand{\Number}{03}\InputImage{\sfl}{\tsm}{\sro}{\tbu}{\sro}{\tbu}
+{}{}
+\renewcommand{\Number}{04}\InputImage{\sfl}{\tsm}{\sro}{\tbu}{\sro}{\tbu}
+{}{}
+\renewcommand{\Number}{05}\InputImage{\sfl}{\tsm}{\sro}{\tbu}{\sro}{\tbu}
+{}{}
+\renewcommand{\Number}{06}\InputImage{\sfl}{\tsm}{\sro}{\tbu}{\sro}{\tbu}
+{Watermark.}{}
+\renewcommand{\Number}{07}\InputImage{\sfl}{\tsm}{\sro}{\tbu}{\sro}{\tbu}
+{Watermark.}{}
+\renewcommand{\Number}{08}\InputImage{\sfl}{\tsm}{\sro}{\tbu}{\sro}{\tbu}
+{}{}
+\renewcommand{\Number}{09}\InputImage{\sfl}{\tsm}{\sro}{\tbu}{\sro}{\tbu}
+{}{}
+\renewcommand{\Number}{10}\InputImage{\sfl}{\tsm}{\sro}{\tbu}{\sro}{\tbu}
+{}{}
+\renewcommand{\Number}{11}\InputImage{\sfl}{\tsm}{\sro}{\tbu}{\sro}{\tbu}
+{}{}
+\renewcommand{\Number}{12}\InputImage{\sfl}{\tsm}{\sro}{\tbu}{\sro}{\tbu}
+{}{}
+
+%%%
+\clearpage
+\renewcommand{\mat}{Silk}
+\subsection{\mat}
+
+\renewcommand{\Number}{01}\InputImage{\sfl}{\tsm}{\sfl}{\tsm}{\sexdi}{\tbu}
+{}{}
+\renewcommand{\Number}{02}\InputImage{\sfl}{\tsm}{\sfl}{\tsm}{\sexdi}{\tbu}
+{}{}
+\renewcommand{\Number}{03}\InputImage{\sfl}{\tsm}{\sfl}{\tsm}{\sexdi}{\tbu}
+{}{}
+\renewcommand{\Number}{04}\InputImage{\sexor}{\tsm}{\sfl}{\tsm}{\sexdi}{\tbu}
+{}{}
+\renewcommand{\Number}{05}\InputImage{\sfl}{\tsm}{\sfl}{\tsm}{\sexdi}{\tbu}
+{}{}
+\renewcommand{\Number}{06}\InputImage{\sfl}{\tsm}{\sfl}{\tsm}{\sexdi}{\tbu}
+{}{}
+\renewcommand{\Number}{07}\InputImage{\sfl}{\tsm}{\sfl}{\tsm}{\sexdi}{\tbu}
+{}{}
+\renewcommand{\Number}{08}\InputImage{\sfl}{\tsm}{\sfl}{\tsm}{\sexdi}{\tbu}
+{}{}
+\renewcommand{\Number}{09}\InputImage{\sfl}{\tsm}{\sfl}{\tsm}{\sexdi}{\tbu}
+{}{}
+\renewcommand{\Number}{10}\InputImage{\sexor}{\tsm}{\sfl}{\tsm}{\sexdi}{\tbu}
+{}{}
+\renewcommand{\Number}{11}\InputImage{\sfl}{\tsm}{\sfl}{\tsm}{\sexdi}{\tbu}
+{}{}
+\renewcommand{\Number}{12}\InputImage{\sfl}{\tsm}{\sfl}{\tsm}{\sexdi}{\tbu}
+{}{}
+
+%%%
+\clearpage
+\renewcommand{\mat}{Slate}
+\subsection{\mat}
+
+\renewcommand{\Number}{01}\InputImage{\sfl}{\tco}{\sexdi}{\tco}{\sexdi}{\tco}
+{}{}
+\renewcommand{\Number}{02}\InputImage{\sfl}{\tco}{\sexor}{\tco}{\sexor}{\tco}
+{?}{}
+\renewcommand{\Number}{03}\InputImage{\sfl}{\tco}{\sexdi}{\tco}{\sexdi}{\tco}
+{}{}
+\renewcommand{\Number}{04}\InputImage{\sfl}{\tco}{\sfl}{\tco}{\sexdi}{\tco}
+{}{}
+\renewcommand{\Number}{05}\InputImage{\sfl}{\tco}{\sexdi}{\tco}{\sexdi}{\tco}
+{}{}
+\renewcommand{\Number}{06}\InputImage{\sfl}{\tco}{\sexdi}{\tco}{\sexdi}{\tco}
+{}{}
+\renewcommand{\Number}{07}\InputImage{\sfl}{\tco}{\sexdi}{\tco}{\sexdi}{\tbu}
+{}{}
+\renewcommand{\Number}{08}\InputImage{\sfl}{\tco}{\sfl}{\tco}{\sfl}{\tco}
+{}{}
+\renewcommand{\Number}{09}\InputImage{\sfl}{\tco}{\sexdi}{\tco}{\sexdi}{\tco}
+{}{}
+\renewcommand{\Number}{10}\InputImage{\sfl}{\tco}{\sexdi}{\tco}{\sexdi}{\tco}
+{}{}
+\renewcommand{\Number}{11}\InputImage{\sfl}{\tco}{\sexdi}{\tco}{\sexdi}{\tco}
+{Watermark.}{Same as slate 09.}
+\renewcommand{\Number}{12}\InputImage{\sfl}{\tco}{\sexdi}{\tco}{\sexdi}{\tco}
+{}{}
+
+%%%
+\clearpage
+\renewcommand{\mat}{Stucco}
+\subsection{\mat}
+
+\renewcommand{\Number}{01}\InputImage{\sfl}{\tsm}{\sro}{\tco}{\sro}{\tco}
+{}{}
+\renewcommand{\Number}{02}\InputImage{\sro}{\tco}{\sro}{\tco}{\sro}{\tco}
+{Watermark.}{}
+\renewcommand{\Number}{03}\InputImage{\sfl}{\tco}{\sfl}{\tco}{\sfl}{\tco}
+{}{}
+\renewcommand{\Number}{04}\InputImage{\sfl}{\tco}{\sfl}{\tco}{\sfl}{\tco}
+{}{}
+\renewcommand{\Number}{05}\InputImage{\sfl}{\tco}{\sro}{\tco}{\sro}{\tco}
+{}{}
+\renewcommand{\Number}{06}\InputImage{\sfl}{\tco}{\sro}{\tco}{\sro}{\tco}
+{}{}
+\renewcommand{\Number}{07}\InputImage{\sfl}{\tco}{\sfl}{\tco}{\sexdi}{\tbu}
+{}{}
+\renewcommand{\Number}{08}\InputImage{\sfl}{\tco}{\sfl}{\tco}{\sfl}{\tco}
+{}{}
+\renewcommand{\Number}{09}\InputImage{\sfl}{\tco}{\sfl}{\tco}{\sfl}{\tco}
+{}{}
+\renewcommand{\Number}{10}\InputImage{\sfl}{\tco}{\sro}{\tco}{\sro}{\tco}
+{}{Same as stucco 05.}
+\renewcommand{\Number}{11}\InputImage{\sfl}{\tco}{\sro}{\tco}{\sro}{\tco}
+{}{}
+\renewcommand{\Number}{12}\InputImage{\sfl}{\tco}{\sfl}{\tco}{\sfl}{\tco}
+{}{}
+
+%%%
+\clearpage
+\renewcommand{\mat}{Velour}
+\subsection{\mat}
+
+\renewcommand{\Number}{01}\InputImage{\sfl}{\tve}{\sfl}{\tve}{\sfl}{\tve}
+{}{}
+\renewcommand{\Number}{02}\InputImage{\sfl}{\tve}{\sfl}{\tve}{\sexdi}{\tbu}
+{}{}
+\renewcommand{\Number}{03}\InputImage{\sfl}{\tve}{\sfl}{\tve}{\sexdi}{\tbu}
+{}{}
+\renewcommand{\Number}{04}\InputImage{\sfl}{\tve}{\sfl}{\tve}{\sexdi}{\tbu}
+{}{}
+\renewcommand{\Number}{05}\InputImage{\sexdi}{\tco}{\sexdi}{\tco}{\sfl}{\tve}
+{}{}
+\renewcommand{\Number}{06}\InputImage{\sfl}{\tve}{\sfl}{\tve}{\sexor}{\tbu}
+{}{}
+\renewcommand{\Number}{07}\InputImage{\sfl}{\tve}{\sfl}{\tve}{\sexdi}{\tbu}
+{}{}
+\renewcommand{\Number}{08}\InputImage{\sfl}{\tve}{\sfl}{\tve}{\sexdi}{\tbu}
+{}{}
+\renewcommand{\Number}{09}\InputImage{\sfl}{\tve}{\sfl}{\tve}{\sexdi}{\tbu}
+{}{}
+\renewcommand{\Number}{10}\InputImage{\sfl}{\tve}{\sfl}{\tve}{\sexdi}{\tbu}
+{}{}
+\renewcommand{\Number}{11}\InputImage{\sfl}{\tve}{\sfl}{\tve}{\sexor}{\tbu}
+{}{}
+\renewcommand{\Number}{12}\InputImage{\sfl}{\tve}{\sfl}{\tve}{\sfl}{\tve}
+{}{}
+
+\clearpage
+\bibliography{markup_bibliography}
+\bibliographystyle{abbrv}
+
+\end{singlespace}
+\end{document}

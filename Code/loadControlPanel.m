@@ -22,7 +22,7 @@ SAMPLE_IMAGES_FORMAT = 'png';
 TRAINING_IMAGE_PART = 'LeftHalf';
 TEST_IMAGE_PART = 'RightHalf';
 FEATURE_EXTRACTOR = 'SIFT';          % One of PHOW, SIFT or DSIFT. 
-MAX_DESCRIPTORS_PER_IMAGE = 2000;    % 0 means no maximum.
+MAX_DESCRIPTORS_PER_IMAGE = 1000;    % 0 means no maximum.
 
 %%% K-means
 NUM_CLUSTERS = 50;            % Min number of clusters obtained.
@@ -33,4 +33,4 @@ KMEANS_BRANCHING_FACTOR = 100;   % Branching factor (only with HIERARCHICAL).
 %%% Support Vector Machines.
 SOLVER = 'SDCA';    % Solver method: SGD or SDCA.
 LOSS = 'Logistic';  % Loss function: Hinge, Hinge2, L1, L2 or LOGISTIC.
-LAMBDA = 0.01;  % Lambda value of the SVM.
+LAMBDA = 1e-01;     % Lambda value of the SVM.

@@ -1,0 +1,48 @@
+This is BibTeX, Version 0.99d (TeX Live 2012)
+Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
+The top-level auxiliary file: final_report.aux
+The style file: abbrv.bst
+Database file #1: final_bibliography.bib
+Warning--empty booktitle in Liao_2013_CVPR
+You've used 1 entry,
+            2118 wiz_defined-function locations,
+            503 strings with 3975 characters,
+and the built_in function-call counts, 348 in all, are:
+= -- 26
+> -- 23
+< -- 0
++ -- 9
+- -- 8
+* -- 25
+:= -- 65
+add.period$ -- 3
+call.type$ -- 1
+change.case$ -- 7
+chr.to.int$ -- 0
+cite$ -- 2
+duplicate$ -- 13
+empty$ -- 27
+format.name$ -- 8
+if$ -- 67
+int.to.chr$ -- 0
+int.to.str$ -- 1
+missing$ -- 1
+newline$ -- 8
+num.names$ -- 2
+pop$ -- 12
+preamble$ -- 1
+purify$ -- 6
+quote$ -- 0
+skip$ -- 7
+stack$ -- 0
+substring$ -- 5
+swap$ -- 1
+text.length$ -- 0
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 4
+warning$ -- 1
+while$ -- 2
+width$ -- 2
+write$ -- 11
+(There was 1 warning)

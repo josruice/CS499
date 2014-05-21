@@ -117,8 +117,9 @@ for iClass = 1:nClasses,
                                         [nSamplesPerCategory, nCategories])'; 
 
     % Compute the confusion matrix and the accuracy. Store them in a cell array.
-    confusionMatrix = accumarray([classRealBinaryLabels, ...
-                                 classEstimatedBinaryLabels']+1, 1) ./ nSamples;
+    confusionMatrix = accumarray([classRealBinaryLabels,                    ...
+                                 classEstimatedBinaryLabels']+1, 1, [2 2])  ...
+                      ./ nSamples;
     accuracy = sum(diag(confusionMatrix));
     accuraciesCellArray{iClass} = {className, accuracy, confusionMatrix};
 
@@ -137,7 +138,7 @@ estimatedLabelsCellArray = mat2cell(estimatedLabelsMatrix, ...
 estimatedLabelsCellArray = cellfun(@(x) reshape(x, [], 1),   ...
                                    estimatedLabelsCellArray, ...
                                    'UniformOutput', false);
-keyboard;
+
 if verbose >= 1
     % Print the resulting accuracies.
     accuraciesArray = extractFromCell(accuraciesCellArray, 2);
@@ -153,21 +154,14 @@ if verbose >= 1
                                      'UniformOutput', false);
         confusionsMatrix = extractFromCell(accuraciesCellArray, 3);
 
+        % Global accuracy.
         figureName = 'Properties detection global accuracy';
         xArray = accuraciesArray;
         xLabelsCellArray = classNameCellArray;
-        color = 'r';
+        color = 'y';
         plotAccuraciesBarGraph(figureName, xArray, xLabelsCellArray, color);
 
-
-        figureName = 'Properties detection accuracy detecting positives';
-        xArray = reshape(confusionsMatrix(2,2,:) ./ ...
-                    (confusionsMatrix(2,1,:) + confusionsMatrix(2,2,:)), [], 1);
-        xLabelsCellArray = classNameCellArray;
-        color = 'b';
-        plotAccuraciesBarGraph(figureName, xArray, xLabelsCellArray, color);
-
-
+        % Sorted global accuracies.
         [~,I] = sortrows(extractFromCell(accuraciesCellArray, 2));
         sortedByAccuraciesCellArray = accuraciesCellArray(I);
         sortedClassNameCellArray = cellfun(@(x) x{1},                   ...
@@ -175,25 +169,54 @@ if verbose >= 1
                                            'UniformOutput', false);
         sortedAccuraciesArray = extractFromCell(sortedByAccuraciesCellArray, 2);
 
-        figureName = 'Properties detection sorted by global accuracy';
+        figureName = 'Sorted properties detection global accuracy';
         xArray = sortedAccuraciesArray;
         xLabelsCellArray = sortedClassNameCellArray;
-        color = 'r';
+        color = 'y';
         plotAccuraciesBarGraph(figureName, xArray, xLabelsCellArray, color);
 
-
-        [sortedPositiveAccuraciesArray,I] = sortrows(cellfun(@(x) ...
-            x{3}(2,2,:)./(x{3}(2,1,:)+x{3}(2,2,:)), accuraciesCellArray));
-        sortedByPositiveAccuraciesCellArray = accuraciesCellArray(I);
-        sortedPositiveClassNameCellArray = cellfun(@(x) x{1},                ...
-                                        sortedByPositiveAccuraciesCellArray, ...
-                                        'UniformOutput', false);
-
-        figureName = 'Properties detection sorted accuracy detecting positives';
-        xArray = sortedPositiveAccuraciesArray;
-        xLabelsCellArray = sortedPositiveClassNameCellArray;
+        % Recall.
+        figureName = 'Properties detection recall';
+        xArray = reshape(confusionsMatrix(2,2,:) ./ ...
+                    (confusionsMatrix(2,1,:) + confusionsMatrix(2,2,:)), [], 1);
+        xLabelsCellArray = classNameCellArray;
         color = 'b';
         plotAccuraciesBarGraph(figureName, xArray, xLabelsCellArray, color);
 
+        % Sorted recall.
+        [sortedRecallArray,I] = sortrows(cellfun(@(x) ...
+                  x{3}(2,2,:)./(x{3}(2,1,:)+x{3}(2,2,:)), accuraciesCellArray));
+        sortedRecallCellArray = accuraciesCellArray(I);
+        sortedRecallClassNameCellArray = cellfun(@(x) x{1},                 ...
+                                        sortedRecallCellArray,              ...
+                                        'UniformOutput', false);
+
+        figureName = 'Sorted properties detection recall';
+        xArray = sortedRecallArray;
+        xLabelsCellArray = sortedRecallClassNameCellArray;
+        color = 'b';
+        plotAccuraciesBarGraph(figureName, xArray, xLabelsCellArray, color);
+
+        % Precision.
+        figureName = 'Properties detection precision';
+        xArray = reshape(confusionsMatrix(2,2,:) ./ ...
+                    (confusionsMatrix(1,2,:) + confusionsMatrix(2,2,:)), [], 1);
+        xLabelsCellArray = classNameCellArray;
+        color = 'g';
+        plotAccuraciesBarGraph(figureName, xArray, xLabelsCellArray, color);
+
+        % Sorted precision.
+        [sortedPrecisionArray,I] = sortrows(cellfun(@(x) ...
+                  x{3}(2,2,:)./(x{3}(1,2,:)+x{3}(2,2,:)), accuraciesCellArray));
+        sortedPrecisionCellArray = accuraciesCellArray(I);
+        sortedPrecisionClassNameCellArray = cellfun(@(x) x{1},                 ...
+                                        sortedPrecisionCellArray,              ...
+                                        'UniformOutput', false);
+
+        figureName = 'Sorted properties detection precision';
+        xArray = sortedPrecisionArray;
+        xLabelsCellArray = sortedPrecisionClassNameCellArray;
+        color = 'g';
+        plotAccuraciesBarGraph(figureName, xArray, xLabelsCellArray, color);
     end
 end

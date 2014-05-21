@@ -141,3 +141,42 @@ SVMs trained with predicted data:
 SVMs trained with ground truth data:
 [Predicted data] Correct with SVMs (one vs. all): 132 out of 216 (61.11 %)
 [Ground truth data] Correct with SVMs (one vs. all): 197 out of 216 (91.20 %)
+
+________________________________________________________________________________
+
+%%%%%
+% 3 %
+%%%%%
+
+Execution data:
+ - Descriptors: PHOW
+ - Num clusters: 500 (datatype single, hierarchical 0, branching 100)
+ - SVM solver: SDCA (Logistic loss, lambda 0.000001)
+
+Training
+ - Descriptors: 216000 descriptors. Elapsed time is 54.004089 seconds.
+ - Kmeans: 500 clusters. Elapsed time is 70.594129 seconds.
+ - SMVs: Mean accuracy: 99.70. Elapsed time is 0.272172 seconds.
+
+Testing: 
+ - Descriptors: 216000 descriptors. Elapsed time is 52.092825 seconds.
+ - Kmeans: Elapsed time is 4.639854 seconds.
+ - SVMs: Mean accuracy: 91.45. Elapsed time is 2.854108 seconds.
+Correct with Naive Bayes: 181 out of 216 (83.80 %)
+Correct with Naive Bayes: 183 out of 216 (84.72 %)
+
+Naive Bayes trained with predicted data:
+[Predicted data] Correct with Naive Bayes: 136 out of 216 (62.96 %)
+[Ground truth data] Correct with Naive Bayes: 182 out of 216 (84.26 %)
+
+Naive Bayes trained with ground truth data:
+[Predicted data] Correct with Naive Bayes: 134 out of 216 (62.04 %)
+[Ground truth data] Correct with Naive Bayes: 183 out of 216 (84.72 %)
+
+SVMs trained with predicted data:
+[Predicted data] Correct with SVMs (one vs. all): 140 out of 216 (64.81 %)
+[Ground truth data] Correct with SVMs (one vs. all): 197 out of 216 (91.20 %)
+
+SVMs trained with ground truth data:
+[Predicted data] Correct with SVMs (one vs. all): 143 out of 216 (66.20 %)
+[Ground truth data] Correct with SVMs (one vs. all): 197 out of 216 (91.20 %)
