@@ -1,5 +1,45 @@
 function [estimatedLabelsCellArray, svmsCellArray] = svm (featuresCellArray, realClassLabelsCellArray, modality, varargin)
 % svm Trains or tests SVMs using the given sample features and labels.
+%   
+%   [estimatedLabelsCellArray, svmsCellArray] = svm (featuresCellArray, 
+%       realClassLabelsCellArray, modality)
+%   returns a cell array with the labels estimated applying Support Vector
+%   Machines (SVMs) to the given feature vectors and labels. If the modality 
+%   specified is TESTING_MODALITY, a parameter with a cell array containing the
+%   SVMs to use must be given. Else, a cell array with the SVMs is also returned
+%   with the following structure: 
+%   {'Class name', SVM weight vector (W), SVM bias (B)}
+%
+%   featuresCellArray must be a matrix cell array where each cell contains a
+%   column vector that represents the feature vector of the sample. 
+%
+%   realClassLabelsCellArray must be a column cell array where each cell
+%   contains a string with the name of the class and a binary matrix where the 
+%   i,j determines if the ith row and jth column cell of the features cell array
+%   belongs to the class.
+%
+%   modality must be TRAINING_MODALITY or TESTING_MODALITY.
+%   
+%   svm() accepts the following options:
+%
+%   SVMs:: {}
+%       The cell array with the SVMs used in the TESTING_MODALITY with the
+%       following structure: {'Class name', SVM weight vector (W), SVM bias (B)}
+%
+%   BinaryFeatures:: false
+%       Usage of binary features.
+%
+%   Lambda:: 0.01
+%       SVMs lambda parameter. It is related with the number of iterations.
+%
+%   Solver:: SDCA
+%       SVMs solver method. One of SDCA, SGD.
+%
+%   Loss:: Logistic
+%       SVMs loss function. One of HINGE, HINGE2, L1, L2, LOGISTIC.
+%
+%   Verbose:: 0
+%       Determines the level of verbosity of the execution.
 
 % Load constants file.
 loadConstants;
@@ -13,7 +53,7 @@ parser.addRequired(LABELS_PARAM, @(x) length(x)>0);
 parser.addRequired(MODALITY_PARAM, @isstr);
 
 parser.addParamValue(SVMS_PARAM, DEFAULT_SVMS, @(x) length(x)>0);
-parser.addParamValue(BINARY_HISTOGRAMS_PARAM, DEFAULT_BINARY_HISTOGRAMS, ...
+parser.addParamValue(BINARY_FEATURES_PARAM, DEFAULT_BINARY_FEATURES, ...
                      @islogical);
 parser.addParamValue(LAMBDA_PARAM, DEFAULT_LAMBDA, @isnumeric);
 parser.addParamValue(SOLVER_PARAM, DEFAULT_SOLVER, @isstr);
@@ -30,7 +70,7 @@ realClassLabelsCellArray = inputs.(LABELS_PARAM);
 modality = inputs.(MODALITY_PARAM);
 
 svmsCellArray = inputs.(SVMS_PARAM);
-shouldBinaryHistograms = inputs.(BINARY_HISTOGRAMS_PARAM);
+shouldBinaryFeatures = inputs.(BINARY_FEATURES_PARAM);
 lambda = inputs.(LAMBDA_PARAM);
 solver = inputs.(SOLVER_PARAM);
 loss = inputs.(LOSS_PARAM);
@@ -54,7 +94,7 @@ featuresMatrix = cell2mat(cellfun(@(x) x', reshape(featuresCellArray',[],1), ...
                           'UniformOutput', false))';
 
 % Use binary histograms if required.
-if shouldBinaryHistograms
+if shouldBinaryFeatures
     featuresMatrix( find(featuresMatrix) ) = 1;
 end
 

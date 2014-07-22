@@ -5,6 +5,9 @@
 %%% General.
 VERBOSE = 1; % Verbose level.
 
+% VLFeat library path.
+VLFEAT_LIBRARY_PATH = '/Users/Josevi/Libraries/vlfeat-0.9.18/toolbox/vl_setup';
+
 %%% Data.
 IMAGES_ROOT_PATH = '../Dataset'; % Without last slash.
 

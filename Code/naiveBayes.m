@@ -1,5 +1,20 @@
 function [estimatedLabelsMatrix, bayesClassifier, confusionMatrix] = ...
     naiveBayes (featuresMatrix, realClassLabelsMatrix, modality, varargin)
+% naiveBayes Classifies the given samples using Naive Bayes.
+%
+%   [estimatedLabelsMatrix, bayesClassifier, confusionMatrix] =
+%       naiveBayes (featuresMatrix, realClassLabelsMatrix, modality)
+%   returns the estimated labels, bayes classifier and confusion matrix that 
+%   result of the classification process of the given feature vectors using the 
+%   specified SVMs with One vs. All.
+%   
+%   naiveBayes() accepts the following options:
+%   
+%   
+%   
+%   
+%   
+%   
 
 % Load constants file.
 loadConstants;

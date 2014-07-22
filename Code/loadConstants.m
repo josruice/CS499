@@ -2,9 +2,6 @@
 %%%    GENERAL    %%%
 %%%%%%%%%%%%%%%%%%%%%
 
-% VLFeat library path.
-VLFEAT_LIBRARY_PATH = '/Users/Josevi/Libraries/vlfeat-0.9.18/toolbox/vl_setup';
-
 % Classification standard parameters.
 FEATURES_PARAM = 'Features';
 LABELS_PARAM = 'Labels';      
@@ -104,14 +101,14 @@ FEATURES_PARAM;     % Required.
 LABELS_PARAM;       % Required.
 MODALITY_PARAM;     % Required.
 SVMS_PARAM = 'SVMs';
-BINARY_HISTOGRAMS_PARAM = 'BinaryHistograms';
+BINARY_FEATURES_PARAM = 'BinaryFeatures';
 LAMBDA_PARAM = 'Lambda';
 SOLVER_PARAM = 'Solver';
 LOSS_PARAM = 'Loss';
 
 % Default parameter values.
 DEFAULT_SVMS = {};
-DEFAULT_BINARY_HISTOGRAMS = false;
+DEFAULT_BINARY_FEATURES = false;
 DEFAULT_LAMBDA = 0.01;
 DEFAULT_SOLVER = 'SDCA';
 DEFAULT_LOSS = 'Logistic';

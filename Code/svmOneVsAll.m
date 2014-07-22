@@ -1,5 +1,17 @@
 function [estimatedLabelsMatrix, confusionMatrix] = ...
     svmOneVsAll (svmsCellArray, featuresMatrix, realClassLabelsMatrix, varargin)
+% svmOneVsAll Classifies the given samples using SVMs with One vs. All.
+%
+%   [estimatedLabelsMatrix, confusionMatrix] = svmOneVsAll (svmsCellArray,
+%       featuresMatrix, realClassLabelsMatrix, varargin)
+%   returns the estimated labels and the confusion matrix that result of the 
+%   classification process of the given feature vectors using the specified SVMs
+%   with One vs. All.
+%
+%   svmOneVsAll() accepts the following options:
+%
+%   Verbose:: 0
+%       Determines the level of verbosity of the execution.
 
 % Load constants file.
 loadConstants;

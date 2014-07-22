@@ -1,6 +1,9 @@
 # To reduce repo size.
 Papers/*
 
+# Personal data.
+Latex/Approval application
+
 # Mac stuff.
 .Trashes
 .DS_Store
