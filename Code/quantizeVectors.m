@@ -3,10 +3,10 @@ function [quantizedVectorsCellArray, clusterCentersMatrix, nClusters] = ...
 % quantizeVectors Quantize the given cell array of vectors.
 %
 %   quantizedVectorsCellArray = quantizeVectors (vectorsCellArray, nClusters)
-%   returns a cell array where the i,j cell contains a column vector that 
-%   represent the quantization of the vectors of the ith row and jth column of 
-%   the vectorsCellArray cell array after applying computing the cluster centers
-%   with all the vectors of vectorsCellArray.
+%   returns a cell array where each cell contains a column vector that repre-
+%   sents the quantization of the vectors of the equivalent one of the
+%   vectorsCellArray cell array after computing the cluster centers with all the
+%   vectors of vectorsCellArray.
 %
 %   [quantizedVectorsCellArray, clusterCentersMatrix, nClusters] = 
 %       quantizeVectors (vectorsCellArray, nClusters)
@@ -74,14 +74,13 @@ end
 
 % Convert the vectors cell array into a standard 2D matrix with the vectors in 
 % the columns and the required datatype.
-vectorsCellArrayTrasposed = vectorsCellArray';
-vectorsMatrix = cell2mat(cellfun(@(x) x', vectorsCellArrayTrasposed(:), ...
+vectorsMatrix = cell2mat(cellfun(@(x) x', vectorsCellArray, ...
                         'UniformOutput', false))';
 vectorsMatrix = eval([datatype '(vectorsMatrix)']);
 
 % Keep track of the number of descriptors of each cell of the original vector
 % cell array to reconstruct the quantized vectors later.
-nDescriptorsMatrix = cellfun(@(x) size(x,2), vectorsCellArray);
+nDescriptorsVector = cellfun(@(x) size(x,2), vectorsCellArray);
 
 % If no clusters centers have been given, build the clusters applying K-means 
 % clustering to the vectors matrix obtained from the given vectors cell array
@@ -129,26 +128,21 @@ case SINGLE_DATATYPE
 otherwise
     % Never supposed to happen.
 end
-% The output column vector indices contains the results sorted by rows and 
-% columns the same way as the cell array of vectors.
 
+% Build the quantized vectors and store the result in a 2D cell array where each
+% cell contains the quantized vector of the equivalent one in the original vec-
+% tors cell array.
+nElements = length(vectorsCellArray);   
+quantizedVectorsCellArray = cell(nElements, 1);
+for i = 1:nElements,
+    % For each cluster center, it is counted the number of vectors of the 
+    % original cell array that belong to the same cluster. The result is a
+    % quantized vector.
+    quantized = accumarray(indices(1:nDescriptorsVector(i))', 1);
+    quantizedVectorsCellArray{i} = zeros(nClusters, 1);
+    quantizedVectorsCellArray{i}(1:length(quantized)) = quantized;
 
-% Build the quantized vectors and store the result in a 2D cell array where the
-% i,j cell contains the quantized vector of the ith row and jth colum vectors of
-% the original vectors cell array.
-[nRows nColumns] = size(vectorsCellArray);   
-quantizedVectorsCellArray = cell(nRows, nColumns);
-for i = 1:nRows,
-    for j = 1:nColumns,
-        % For each cluster center, it is counted the number of vectors of the 
-        % original cell array that belong to the same cluster. The result is a
-        % quantized vector.
-        quantized = accumarray(indices(1:nDescriptorsMatrix(i,j))', 1);
-        quantizedVectorsCellArray{i,j} = zeros(nClusters, 1);
-        quantizedVectorsCellArray{i,j}(1:length(quantized)) = quantized;
-
-        % The indices vector can be chopped out in this way because the 
-        % elements are in order (first rows, then columns) inside the vector.
-        indices = indices(nDescriptorsMatrix(i,j)+1:end);
-    end
+    % The indices vector can be chopped out in this way because the elements are
+    % in order inside the vector.
+    indices = indices(nDescriptorsVector(i)+1:end);
 end

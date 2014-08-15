@@ -83,9 +83,7 @@ if not(modalityAllowed)
 end
 
 % Variables to improve code legibility.
-[nCategories, nSamplesPerCategory, nFeaturesPerSample] = ...
-    size(featuresCellArray);
-nSamples = nCategories * nSamplesPerCategory;
+nSamples = length(featuresCellArray);
 nClasses = length(realClassLabelsCellArray);
 
 % Convert the samples features cell array into a standard 2D matrix with the 
@@ -103,13 +101,13 @@ if not(strcmpi(modality, TESTING_MODALITY))
     svmsCellArray = cell(nClasses, 1);
 end
 
-% Cell array to store the estimated labels of the samples. The i,j cell contains
-% a column vectors where k element represents if jth sample of ith category
-% belongs to kth class (1 if it belongs, 0 otherwise). 
-estimatedLabelsCellArray = cell(nCategories, nSamplesPerCategory);
+% Cell array to store the estimated labels of the samples. Each cell contains
+% a column vectors where i element represents if that sample belongs to ith 
+% class (1 if it belongs, 0 otherwise). 
+estimatedLabelsCellArray = cell(nSamples, 1);
 
 % Matrix with the same meaning as the above cell array.
-estimatedLabelsMatrix = zeros(nCategories, nSamplesPerCategory, nClasses);
+estimatedLabelsMatrix = zeros(nClasses, nSamples);
 
 % Cell array used to store the name of a class, the accuracy obtained in the 
 % classification process and its confusion matrix.
@@ -153,8 +151,7 @@ for iClass = 1:nClasses,
     classEstimatedBinaryLabels( find(classEstimatedLabels == -1) ) = 0;
     
     % Store the estimated labels of each sample using binary vectors.
-    estimatedLabelsMatrix(:,:,iClass) = reshape(classEstimatedBinaryLabels, ...
-                                        [nSamplesPerCategory, nCategories])'; 
+    estimatedLabelsMatrix(iClass,:) = classEstimatedBinaryLabels; 
 
     % Compute the confusion matrix and the accuracy. Store them in a cell array.
     confusionMatrix = accumarray([classRealBinaryLabels,                    ...
@@ -172,12 +169,8 @@ end
 
 % Convert the estimated labels matrix into a cell array with column vector 
 % cells.
-estimatedLabelsCellArray = mat2cell(estimatedLabelsMatrix, ...
-                                    ones(nCategories,1),   ...
-                                    ones(nSamplesPerCategory,1), nClasses);
-estimatedLabelsCellArray = cellfun(@(x) reshape(x, [], 1),   ...
-                                   estimatedLabelsCellArray, ...
-                                   'UniformOutput', false);
+estimatedLabelsCellArray = mat2cell(estimatedLabelsMatrix, nClasses,   ...
+                                    ones(nSamples,1))';
 
 if verbose >= 1
     % Print the resulting accuracies.

@@ -1,0 +1,29 @@
+Execution data:
+ - Descriptors: SIFT
+ - Num clusters: 50 (datatype single, hierarchical 0, branching 100)
+ - SVM solver: SDCA (Logistic loss, lambda 0.100000)
+
+Descriptors: 100962 descriptors. Elapsed time is 32.859971 seconds.
+
+ACCURACY RESULTS: 
+68 out of 217 (31.34 %) - Naive Bayes trained with predicted data and tested with predicted data.
+102 out of 217 (47.00 %) - Naive Bayes trained with predicted data and tested with real data.
+42 out of 217 (19.35 %) - Naive Bayes trained with real data and tested with predicted data.
+167 out of 217 (76.96 %) - Naive Bayes trained with real data and tested with real data.
+52 out of 217 (23.96 %) - SVMS trained with predicted data and tested with predicted data.
+62 out of 217 (28.57 %) - SVMS trained with predicted data and tested with real data.
+33 out of 217 (15.21 %) - SVMS trained with real data and tested with predicted data.
+149 out of 217 (68.66 %) - SVMS trained with real data and tested with real data.
+
+________________________________________________________________________________
+
+
+ACCURACY RESULTS: 
+69 out of 217 (31.80 %) - Naive Bayes trained with predicted data and tested with predicted data.
+167 out of 217 (76.96 %) - Naive Bayes trained with predicted data and tested with real data.
+70 out of 217 (32.26 %) - Naive Bayes trained with real data and tested with predicted data.
+167 out of 217 (76.96 %) - Naive Bayes trained with real data and tested with real data.
+68 out of 217 (31.34 %) - SVMS trained with predicted data and tested with predicted data.
+172 out of 217 (79.26 %) - SVMS trained with predicted data and tested with real data.
+70 out of 217 (32.26 %) - SVMS trained with real data and tested with predicted data.
+173 out of 217 (79.72 %) - SVMS trained with real data and tested with real data.

@@ -1,12 +1,12 @@
-function [estimatedLabelsMatrix, bayesClassifier, confusionMatrix] = ...
-    naiveBayes (featuresMatrix, realClassLabelsMatrix, modality, varargin)
+function [estimatedLabelsArray, bayesClassifier, confusionMatrix] =          ...
+    naiveBayes (featuresMatrix, realClassLabelsArray, nSamplesPerClassArray, ...
+                modality, varargin)
 % naiveBayes Classifies the given samples using Naive Bayes.
 %
-%   [estimatedLabelsMatrix, bayesClassifier, confusionMatrix] =
-%       naiveBayes (featuresMatrix, realClassLabelsMatrix, modality)
+%   [estimatedLabelsArray, bayesClassifier, confusionMatrix] = naiveBayes(
+%       featuresMatrix, realClassLabelsArray, nSamplesPerClassArray, modality)
 %   returns the estimated labels, bayes classifier and confusion matrix that 
-%   result of the classification process of the given feature vectors using the 
-%   specified SVMs with One vs. All.
+%   result of the classification process of the given feature vectors using ...
 %   
 %   naiveBayes() accepts the following options:
 %   
@@ -25,6 +25,7 @@ parser = inputParser;
 % Add required and parametrized arguments.
 parser.addRequired(FEATURES_PARAM, @(x) length(x)>0);
 parser.addRequired(LABELS_PARAM, @(x) length(x)>0);
+parser.addRequired(NUMBER_OF_SAMPLES_PER_CLASS_PARAM, @(x) length(x)>0);
 parser.addRequired(MODALITY_PARAM, @isstr);
 
 parser.addParamValue(BAYES_CLASSIFIER_PARAM, DEFAULT_BAYES_CLASSIFIER, ...
@@ -32,12 +33,14 @@ parser.addParamValue(BAYES_CLASSIFIER_PARAM, DEFAULT_BAYES_CLASSIFIER, ...
 parser.addParamValue(VERBOSE_PARAM, DEFAULT_VERBOSE, @isnumeric);
 
 % Parse input arguments.
-parser.parse(featuresMatrix, realClassLabelsMatrix, modality, varargin{:});
+parser.parse(featuresMatrix, realClassLabelsArray, nSamplesPerClassArray, ...
+             modality, varargin{:});
 inputs = parser.Results;
 
 % Read the arguments.
 featuresMatrix = inputs.(FEATURES_PARAM);
-realClassLabelsMatrix = inputs.(LABELS_PARAM); 
+realClassLabelsArray = inputs.(LABELS_PARAM); 
+nSamplesPerClassArray = inputs.(NUMBER_OF_SAMPLES_PER_CLASS_PARAM);
 modality = inputs.(MODALITY_PARAM);
 
 bayesClassifier = inputs.(BAYES_CLASSIFIER_PARAM);
@@ -50,15 +53,8 @@ if not(modalityAllowed)
 end
 
 % Variables to improve code legibility.
-[nCategories, nSamplesPerCategory, nFeaturesPerSample] = size(featuresMatrix);
-nSamples = nCategories * nSamplesPerCategory;
-
-% Permute and reshape the class labels and features to fit the Naive Bayes 
-% fitting function requirements: samples by rows.
-realClassLabelsArray = reshape(realClassLabelsMatrix', [], 1);
-featuresMatrix = reshape(permute(featuresMatrix, [3 2 1]), ...
-                         [nFeaturesPerSample, nSamples])';
-
+nClasses = length(nSamplesPerClassArray);
+[nSamples, nFeaturesPerSample] = size(featuresMatrix);
 
 if strcmpi(modality, TRAINING_MODALITY)
     % Train a Naive Bayes classifier with the given data.
@@ -68,12 +64,12 @@ end
 
 % Test the Naive Bayes classifier with the given data.
 estimatedLabelsArray = bayesClassifier.predict(featuresMatrix);
-estimatedLabelsMatrix = reshape(estimatedLabelsArray, [nSamplesPerCategory, ...
-                                                       nCategories])';
 
 % Compute the confusion matrix.
-confusionMatrix = accumarray([realClassLabelsArray'; ...
-                              estimatedLabelsArray']',1) ./ nSamplesPerCategory;
+confusionMatrix = accumarray([realClassLabelsArray';            ...
+                              estimatedLabelsArray']',          ...
+                              1, [nClasses,nClasses])  ./       ...
+                              repmat(nSamplesPerClassArray, [1,nClasses]);
 
 if verbose >= 1
     % Check and print the accuracy of the results.

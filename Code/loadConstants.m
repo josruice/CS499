@@ -4,7 +4,8 @@
 
 % Classification standard parameters.
 FEATURES_PARAM = 'Features';
-LABELS_PARAM = 'Labels';      
+LABELS_PARAM = 'Labels';
+NUMBER_OF_SAMPLES_PER_CLASS_PARAM = 'NumberOfSamplesPerClass';
 MODALITY_PARAM = 'Modality';
 
 % Classification modalities.

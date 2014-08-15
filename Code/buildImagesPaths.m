@@ -1,24 +1,24 @@
-function filePathsCellArray = buildImagesPaths (rootPath, folderNames, ...
-                                               fileNames, imagesFormat)
+function filePathsCellArray = buildImagesPaths (rootPath, folderNames,   ...
+                                                nFilesPerFolderArray)
 % buildImagesPaths Construct the file paths of a set of images.
 %
-%   filePathsCellArray = buildImagesPaths (rootPath, folderNames, fileNames, 
-%                                         imagesFormat)
-%   returns a cell matrix of strings where i,j cell represents the complete path 
-%   to image jth image of ith folder.
+%   filePathsCellArray = buildImagesPaths (rootPath, folderNames, 
+%                                          filesPerFolderArray)
+%   returns a cell matrix of strings where each cell represents the complete  
+%   path to an image.
 
 nFolders = length(folderNames);
-nFilesPerFolder = length(fileNames);
-
-% Store the images paths by rows and columns with respect to the folders and 
-% file names.
-filePathsCellArray = cell(nFolders, nFilesPerFolder);
-
+filePathsCellArray = cell(sum(nFilesPerFolderArray), 1);
+iGlobal = 1;
 for iFolder = 1:nFolders,
-    for jFileName = 1:nFilesPerFolder,
-        % Build image path and store it in the cell array.
-        filePath = sprintf('%s/%s/%s.%s', rootPath, folderNames{iFolder},  ...
-                                          fileNames{jFileName}, imagesFormat);
-        filePathsCellArray{iFolder, jFileName} = filePath; 
+    pathToFolder = strcat(rootPath, '/', folderNames{iFolder});
+    listOfFiles = ls(pathToFolder);
+    listOfFilesCellArray = strsplit(listOfFiles, '\s', 'DelimiterType', ...
+                                    'RegularExpression');
+    for jFileName = 1:nFilesPerFolderArray(iFolder),
+        filePath = sprintf('%s/%s', pathToFolder, ...
+                                    listOfFilesCellArray{jFileName});
+        filePathsCellArray{iGlobal} = filePath; 
+        iGlobal = iGlobal+1;
     end
 end
