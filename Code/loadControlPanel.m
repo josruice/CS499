@@ -25,11 +25,11 @@ NUMBER_OF_SAMPLES_PER_CLASS_ARRAY = [12, 12, 12,                            ...
                                      12, 12, 12];
 
 %%% Descriptors.
-FEATURE_EXTRACTOR = 'PHOW';          % One of PHOW, SIFT or DSIFT. 
-MAX_DESCRIPTORS_PER_IMAGE = 1000;    % 0 means no maximum.
+FEATURE_EXTRACTOR = 'PHOW';       % One of PHOW, SIFT or DSIFT. 
+MAX_DESCRIPTORS_PER_IMAGE = 3000;    % 0 means no maximum.
 
 %%% K-means
-NUM_CLUSTERS = 500;            % Min number of clusters obtained.
+NUM_CLUSTERS = 600;            % Min number of clusters obtained.
 KMEANS_DATATYPE = 'single';    % Datatype of the matrix: single or uint8.
 KMEANS_HIERARCHICAL = false;   % Hierarchical (only with uint8).
 KMEANS_BRANCHING_FACTOR = 100;   % Branching factor (only with HIERARCHICAL).

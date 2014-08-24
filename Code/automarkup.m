@@ -95,7 +95,15 @@ accuracySVMTrainedRealTestingReal = 0;
 
 %%% Apply Leave One Out Cross-Validation.
 nTestedSamples = 0;
-for testIndex = 1:12:nSamples,
+% firstIndex = ceil(rand * 12);
+% secondIndex = mod(firstIndex+ceil(rand * 10), 12)+1;
+% testedIndices = [firstIndex:12:nSamples, secondIndex:12:nSamples];
+% firstIndex = 1;
+% testedIndices = firstIndex:12:nSamples;
+testedIndices = 1:nSamples;
+fprintf(STDOUT, 'Tested samples:\n'); 
+disp(testedIndices);fprintf(STDOUT, '\n');
+for testIndex = testedIndices,
 
     %%%
     %%% Training SVMs for properties detection. 
