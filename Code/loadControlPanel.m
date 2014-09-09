@@ -24,9 +24,11 @@ NUMBER_OF_SAMPLES_PER_CLASS_ARRAY = [12, 12, 12,                            ...
                                      12, 12, 12,                            ...
                                      12, 12, 12];
 
+TEST_PARTITIONS = reshape(1:216, 12, 18)';
+
 %%% Descriptors.
-FEATURE_EXTRACTOR = 'PHOW';       % One of PHOW, SIFT or DSIFT. 
-MAX_DESCRIPTORS_PER_IMAGE = 3000;    % 0 means no maximum.
+FEATURE_EXTRACTOR = 'PHOW';        % One of PHOW, SIFT or DSIFT. 
+MAX_DESCRIPTORS_PER_IMAGE = 2000;  % 0 means no maximum.
 
 %%% K-means
 NUM_CLUSTERS = 600;            % Min number of clusters obtained.
@@ -37,4 +39,4 @@ KMEANS_BRANCHING_FACTOR = 100;   % Branching factor (only with HIERARCHICAL).
 %%% Support Vector Machines.
 SOLVER = 'SDCA';    % Solver method: SGD or SDCA.
 LOSS = 'Logistic';  % Loss function: Hinge, Hinge2, L1, L2 or LOGISTIC.
-LAMBDA = 1e-05;     % Lambda value of the SVM.
+LAMBDA = 1e-03;     % Lambda value of the SVM.

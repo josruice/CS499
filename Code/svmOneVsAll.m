@@ -1,10 +1,10 @@
 function [estimatedLabelsArray, confusionMatrix] =                     ...
     svmOneVsAll (svmsCellArray, featuresMatrix, realClassLabelsArray,  ...
-                 nSamplesPerClassArray, varargin)
+                 nClasses, varargin)
 % svmOneVsAll Classifies the given samples using SVMs with One vs. All.
 %
 %   [estimatedLabelsArray, confusionMatrix] = svmOneVsAll (svmsCellArray,
-%       featuresMatrix, realClassLabelsArray, nSamplesPerClassArray, varargin)
+%       featuresMatrix, realClassLabelsArray, nClasses, varargin)
 %   returns the estimated labels and the confusion matrix that result of the 
 %   classification process of the given feature vectors using the specified SVMs
 %   with One vs. All.
@@ -24,23 +24,23 @@ parser = inputParser;
 parser.addRequired(SVMS_PARAM, @(x) length(x)>0);
 parser.addRequired(FEATURES_PARAM, @(x) length(x)>0);
 parser.addRequired(LABELS_PARAM, @(x) length(x)>0);
-parser.addRequired(NUMBER_OF_SAMPLES_PER_CLASS_PARAM, @(x) length(x)>0);
+parser.addRequired(NUMBER_OF_CLASSES_PARAM, @isnumeric);
 parser.addParamValue(VERBOSE_PARAM, DEFAULT_VERBOSE, @isnumeric);
 
 % Parse input arguments.
-parser.parse(svmsCellArray, featuresMatrix, realClassLabelsArray, ...
-             nSamplesPerClassArray, varargin{:});
+parser.parse(svmsCellArray, featuresMatrix, realClassLabelsArray, nClasses, ...
+             varargin{:});
 inputs = parser.Results;
 
 % Read the arguments.
 svmsCellArray = inputs.(SVMS_PARAM);
 featuresMatrix = inputs.(FEATURES_PARAM);
 realClassLabelsArray = inputs.(LABELS_PARAM); 
-nSamplesPerClassArray = inputs.(NUMBER_OF_SAMPLES_PER_CLASS_PARAM);
+nClasses = inputs.(NUMBER_OF_CLASSES_PARAM);
 verbose = inputs.(VERBOSE_PARAM);
 
 % Variables to improve code legibility.
-nClasses = length(nSamplesPerClassArray);
+nSamplesPerClassArray = accumarray(realClassLabelsArray, 1, [nClasses,1]);
 [nSamples, nFeaturesPerSample] = size(featuresMatrix);
 
 % Permute and reshape the features to have one column per sample.

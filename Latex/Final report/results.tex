@@ -1,0 +1,188 @@
+%!TEX root = final_report.tex
+
+\section{Results} \label{sec:results}
+
+%%%%%%%%%%%%%%%%%
+\subsection{Parameter tuning}
+
+Given that several steps of the algorithm produce slightly different outputs depending on some predefined parameters, it is natural to have an interest to find the combination of parameter values that gives the best results. \\
+
+In order to achieve that, the following parameters were considered:
+
+\begin{itemize}
+    \item Maximum number of \emph{SIFT} descriptors per sample image and, related to it, density of \emph{SIFT} while computing them. If the amount of descriptors exceeded the maximum allowed, they were randomly sampled. Its default value was non-dense \emph{SIFT} without maximum amount of descriptors limitation. The results are shown in figures~\ref{fig:descriptorsTestedPred} and~\ref{fig:descriptorsTestedReal}.
+    \item \emph{k} parameter in \emph{k-means}, i.e. number of clusters, with a default value of 300. Its results can be seen in figures~\ref{fig:numberOfClustersTestedPred} and~\ref{fig:numberOfClustersTestedReal}.
+    \item $\lambda$ value in \emph{SVMs}, a regularization parameter directly related with the number of iterations performed while computing the best separation hyperplane. Its default value was $10^{-5}$, and the results are represented by figures~\ref{fig:lambdaTestedPred} and~\ref{fig:lambdaTestedReal}.
+\end{itemize}
+
+The testing procedure consisted on applying \emph{Cross-Validation} to the dataset, using as test samples a set of 18 images, one per material class, each time. With respect to \emph{Cross-Validation}, it is a widely used model validation technique that allows to measure how the results will generalize to an independent dataset. \\
+
+As can be seen, the models trained using as feature vectors the material properties from the markup get a really good accuracy, around 80\%, almost invariably. This invariability makes sense, specially in the case of the parameter tuning for the number of clusters and the \emph{SIFT} descriptors, since the model are not affected by those. \\
+
+On the other side, the models trained with predicted feature vectors, obtain accuracies around 30\% - 40\% in all cases. When tested independently, the best value of each parameter is  dense \emph{SIFT} (\emph{PHOW}) with a maximum of 1000 descriptors per image, 800 clusters for \emph{k-means} and a \emph{SVMs} $\lambda=0.01$. Nevertheless, when tested as a whole, the best accuracy was obtained by a different, although close, set of parameters, as will be seen.
+
+\plotgnu{../../Figures/descriptorsTestedPred.pdf}
+{Graph showing the relation between the material recognition accuracy and the maximum number of \emph{SIFT} descriptors per image, using 300 clusters and \emph{SVMs} $\lambda=10^{-5}$. All these results were obtained using predicted data, i.e. the predicted material properties. In the case of the x-label \emph{SIFT}, no maximum was forced.}
+{fig:descriptorsTestedPred}
+
+\plotgnu{../../Figures/descriptorsTestedReal.pdf}
+{Graph showing the relation between the material recognition accuracy and the maximum number of \emph{SIFT} descriptors per image, using 300 clusters and \emph{SVMs} $\lambda=10^{-5}$. All these results were obtained using real data, i.e. the material properties from the manual markup. In the case of the x-label \emph{SIFT}, no maximum was forced.}
+{fig:descriptorsTestedReal}
+
+\plotgnu{../../Figures/lambdaTestedPred.pdf}
+{Graph showing the relation between the material recognition accuracy and the value of \emph{SVMs} $\lambda$, using 300 clusters and non-dense \emph{SIFT} without maximum descriptors limitation. All these results were obtained using predicted data, i.e. the predicted material properties.}
+{fig:lambdaTestedPred}
+
+\plotgnu{../../Figures/lambdaTestedReal.pdf}
+{Graph showing the relation between the material recognition accuracy and the value of \emph{SVMs} $\lambda$, using 300 clusters and non-dense \emph{SIFT} without maximum descriptors limitation. All these results were obtained using real data, i.e. the material properties from the manual markup.}
+{fig:lambdaTestedReal}
+
+\plotgnu{../../Figures/numberOfClustersTestedPred.pdf}
+{Graph showing the relation between the material recognition accuracy and the number of clusters in \emph{k-means}, using \emph{SVMs} $\lambda=10^{-5}$ and non-dense \emph{SIFT} without maximum descriptors limitation. All these results were obtained using predicted data, i.e. the predicted material properties.}
+{fig:numberOfClustersTestedPred}
+
+\plotgnu{../../Figures/numberOfClustersTestedReal.pdf}
+{Graph showing the relation between the material recognition accuracy and the number of clusters in \emph{k-means}, using \emph{SVMs} $\lambda=10^{-5}$ and non-dense \emph{SIFT} without maximum descriptors limitation. All these results were obtained using real data, i.e. the material properties from the manual markup.}
+{fig:numberOfClustersTestedReal}
+
+
+%%%%%%%%%%%%%%%%%
+\subsection{Properties recognition accuracy}
+
+As previously said, one of the most important parts of the algorithm is its ability to correctly identify the properties present on the material images. To measure this, the following three metrics have been considered:
+
+\begin{itemize}
+    \item \textbf{Global accuracy}: Percentage of classifications where the algorithm correctly identifies that a property is present or that is not present. In other words, true positives plus true negatives, all divided by the total number of samples.
+    \item \textbf{Precision}: Percentage of classifications where the algorithm correctly identifies that a property is present over the total number of times it identifies (correctly or uncorrectly) that same property is present, i.e., true positives divided by true positives plus false positives.
+    \item \textbf{Recall}: Percentage of classifications where the algorithm correctly identifies that a property is present over the total number of samples that actually present that property. Technically, true positives divided by true positives plus true negatives.
+\end{itemize}
+
+The results have been obtained using \emph{Cross-validation} with 12 partitions, guaranteeing that exactly one image of each class was present in every test set. The bar charts for the two first iterations have been plotted, with two versions for every previous metrics: one sorted by material property name (x-axis) and another sorted by the metric value itself (y-axis). The bar charts for the first partition can be seen in the figures~\ref{fig:globalAccuracy3}, ~\ref{fig:globalAccuracySorted3}, ~\ref{fig:precision3}, ~\ref{fig:precisionSorted3}, ~\ref{fig:recall3} and ~\ref{fig:recallSorted3}, while the ones for the second partition are represented in the figures~\ref{fig:globalAccuracy4}, ~\ref{fig:globalAccuracySorted4}, ~\ref{fig:precision4}, ~\ref{fig:precisionSorted4}, ~\ref{fig:recall4} and ~\ref{fig:recallSorted4}. \\
+
+A careful look at the results, reveals that, although the global accuracy seems pretty high for most properties, there is a great room for improvement, as the precision and recall show. Furthermore, in the case of the global accurary, a random classifiers would yield a value approximate to 50\%, which is close, even from the upper part, to the performance obtained in some properties. \\
+
+It can be seen how some properties, like a \emph{flat} shape at \emph{fine} scale, or a \emph{extended disorganized} shape at \emph{medium} scale are hard to recognize for the current set up. On the other side, several touch properties are well recognized at different scales, achieving even a 100\% accuracy. \\
+
+The conclusion that can be extracted from these results is that while \emph{SIFT} descriptors plus vector quantization technique is able to capture enough details for the touch properties, there is still room for improvement in the recognition of shapes.
+
+\plotmatlabbarchart{../../Figures/globalAccuracy3.pdf}
+{Bar chart showing the global accuracy in the detection of a property or the lack of it, sorted by \emph{scale-property}. The test set was composed of the first image of each material class, while the rest of the images were part of the training set. Measurements obtained using dense \emph{SIFT} (\emph{PHOW}) limited to a maximum of 2000 descriptors per image, with 600 clusters and \emph{SVM} $\lambda=10^{-3}$.}
+{fig:globalAccuracy3}
+
+\plotmatlabbarchart{../../Figures/globalAccuracySorted3.pdf}
+{Bar chart showing the global accuracy in the detection of a property or the lack of it, sorted by the accuracy itself. The test set was composed of the first image of each material class, while the rest of the images were part of the training set. Measurements obtained using dense \emph{SIFT} (\emph{PHOW}) limited to a maximum of 2000 descriptors per image, with 600 clusters and \emph{SVM} $\lambda=10^{-3}$.}
+{fig:globalAccuracySorted3}
+
+\plotmatlabbarchart{../../Figures/precision3.pdf}
+{Bar chart showing the \emph{precision} in the detection of a property, i.e. the number of true positives over the total number of image samples that has been classified as having the property, sorted by \emph{scale-property}. The test set was composed of the first image of each material class, while the rest of the images were part of the training set. Measurements obtained using dense \emph{SIFT} (\emph{PHOW}) limited to a maximum of 2000 descriptors per image, with 600 clusters and \emph{SVM} $\lambda=10^{-3}$.}
+{fig:precision3}
+
+\plotmatlabbarchart{../../Figures/precisionSorted3.pdf}
+{Bar chart showing the \emph{precision} in the detection of a property, i.e. the number of true positives over the total number of image samples that has been classified as having the property, sorted by the \emph{precision} itself. The test set was composed of the first image of each material class, while the rest of the images were part of the training set. Measurements obtained using dense \emph{SIFT} (\emph{PHOW}) limited to a maximum of 2000 descriptors per image, with 600 clusters and \emph{SVM} $\lambda=10^{-3}$.}
+{fig:precisionSorted3}
+
+\plotmatlabbarchart{../../Figures/recall3.pdf}
+{Bar chart showing the \emph{recall} in the detection of a property, i.e. the number of true positives over the total number of image samples with the property, sorted by \emph{scale-property}. The test set was composed of the first image of each material class, while the rest of the images were part of the training set. Measurements obtained using dense \emph{SIFT} (\emph{PHOW}) limited to a maximum of 2000 descriptors per image, with 600 clusters and \emph{SVM} $\lambda=10^{-3}$.}
+{fig:recall3}
+
+\plotmatlabbarchart{../../Figures/recallSorted3.pdf}
+{Bar chart showing the \emph{recall} in the detection of a property, i.e. the number of true positives over the total number of image samples with the property, sorted by the \emph{recall} itself. The test set was composed of the first image of each material class, while the rest of the images were part of the training set. Measurements obtained using dense \emph{SIFT} (\emph{PHOW}) limited to a maximum of 2000 descriptors per image, with 600 clusters and \emph{SVM} $\lambda=10^{-3}$.}
+{fig:recallSorted3}
+
+
+\plotmatlabbarchart{../../Figures/globalAccuracy4.pdf}
+{Bar chart showing the global accuracy in the detection of a property or the lack of ifig:t, sorted by \emph{scale-property}. The test set was composed of the second image of each material class, while the rest of the images were part of the training set. Measurements obtained using dense \emph{SIFT} (\emph{PHOW}) limited to a maximum of 2000 descriptors per image, with 600 clusters and \emph{SVM} $\lambda=10^{-3}$.}
+{fig:globalAccuracy4}
+
+\plotmatlabbarchart{../../Figures/globalAccuracySorted4.pdf}
+{Bar chart showing the global accuracy in the detection of a property or the lack of ifig:t, sorted by the accuracy itself. The test set was composed of the second image of each material class, while the rest of the images were part of the training set. Measurements obtained using dense \emph{SIFT} (\emph{PHOW}) limited to a maximum of 2000 descriptors per image, with 600 clusters and \emph{SVM} $\lambda=10^{-3}$.}
+{fig:globalAccuracySorted4}
+
+\plotmatlabbarchart{../../Figures/precision4.pdf}
+{Bar chart showing the \emph{precision} in the detection of a property, i.e. the number of true positives over the total number of image samples that has been classified as having the property, sorted by \emph{scale-property}. The test set was composed of the second image of each material class, while the rest of the images were part of the training set. Measurements obtained using dense \emph{SIFT} (\emph{PHOW}) limited to a maximum of 2000 descriptors per image, with 600 clusters and \emph{SVM} $\lambda=10^{-3}$.}
+{fig:precision4}
+
+\plotmatlabbarchart{../../Figures/precisionSorted4.pdf}
+{Bar chart showing the \emph{precision} in the detection of a property, i.e. the number of true positives over the total number of image samples that has been classified as having the property, sorted by the \emph{precision} itself. The test set was composed of the second image of each material class, while the rest of the images were part of the training set. Measurements obtained using dense \emph{SIFT} (\emph{PHOW}) limited to a maximum of 2000 descriptors per image, with 600 clusters and \emph{SVM} $\lambda=10^{-3}$.}
+{fig:precisionSorted4}
+
+\plotmatlabbarchart{../../Figures/recall4.pdf}
+{Bar chart showing the \emph{recall} in the detection of a property, i.e. the number of true positives over the total number of image samples with the property, sorted by \emph{scale-property}. The test set was composed of the second image of each material class, while the rest of the images were part of the training set. Measurements obtained using dense \emph{SIFT} (\emph{PHOW}) limited to a maximum of 2000 descriptors per image, with 600 clusters and \emph{SVM} $\lambda=10^{-3}$.}
+{fig:recall4}
+
+\plotmatlabbarchart{../../Figures/recallSorted4.pdf}
+{Bar chart showing the \emph{recall} in the detection of a property, i.e. the number of true positives over the total number of image samples with the property, sorted by the \emph{recall} itself. The test set was composed of the second image of each material class, while the rest of the images were part of the training set. Measurements obtained using dense \emph{SIFT} (\emph{PHOW}) limited to a maximum of 2000 descriptors per image, with 600 clusters and \emph{SVM} $\lambda=10^{-3}$.}
+{fig:recallSorted4}
+
+
+
+%%%%%%%%%%%%%%%%%
+\subsection{Confusion matrices}
+
+The last part of the algorithm consists on recognizing the material using the properties extracted from each image. There is no need to highlight the great importance of this step, since this is the main purpose for the whole algorithm. \\
+
+A widely used method to measure the performance of multi-class classification algorithms are the \emph{confusion matrices}. This mathematical tool represents the results as a matrix with the same number of rows and columns as possible classes, and in which the cell in row $i$, column $j$ represents the percentage of times an image of $i^{th}$ class has been classified as an image of $j^{th}$ class. In this situation, the best classifiers will be those that achieve results closer to 1 (or 100\%) in the main diagonal of the matrix, being the ideal a perfect diagonal matrix with all 1. \\
+
+The \emph{confusion matrices} represented in figures~\ref{fig:svmPredPred}, ~\ref{fig:svmPredReal}, ~\ref{fig:svmRealPred}, ~\ref{fig:svmRealReal}, ~\ref{fig:nbPredPred}, ~\ref{fig:nbPredReal}, ~\ref{fig:nbRealPred}, ~\ref{fig:nbRealReal}, show the results for \emph{SVMs} and \emph{Naive Bayes} for all the possible combinations of training and testing using data predicted by the algorithm or data extracted from the manual markup, assummed to be real data. \\
+
+As before, a \emph{Cross-validation} process with 12 partitions have been used, guaranteeing that exactly one image of each class was present in every test set. In this case, the averaged sum of the confusion matrices of every iteration is represented in each image. \\
+
+As can be seen, the most striking fact is that the classifiers tested with feature vectors extracted from the manual markup are able to classify with much higher accuracy, in some cases, almost as twice. The use of this kind of data for the testing part allow us to see the theoretical limitation of the model, since it represents the performance assumming perfect results in the process of recognizing the material properties. The fact that the achieved accuracy with this data is above 80\% is a good sign of the ability of the vocabulary to capture the difference between material classes. \\
+
+The \emph{confusion matrices} also give us insights about what classes are close to each other in terms of properties, taking into account the current vocabulary. For example, a fair amount of \emph{concrete} samples are classified as \emph{stucco}, and the other way around. Also, it can be extracted which classes lose more information in the property recognition process, since they get almost no correct classifications when testing the predicted properties. Examples of this are \emph{denim} and \emph{knitguernsey}. \\
+
+\plotmatlabconfusion{../../Figures/nbPredPred.png}
+{Heat map representing the confusion matrix of the material recognition process using \emph{Naive Bayes} trained with predicted data, i.e., properties estimated algorithmically, and tested also with predicted data. The results are the average of a \emph{cross-validation} process of 12 partitions, where the test set had at least one sample of each class. The parameters used are dense \emph{SIFT} (\emph{PHOW}) limited to a maximum of 2000 descriptors per image, with 600 clusters and \emph{SVM} $\lambda=10^{-3}$. The average precision obtained is 45.37 \%, with 98 out of 216 samples correctly classified.}
+{fig:nbPredPred}
+
+\plotmatlabconfusion{../../Figures/nbPredReal.png}
+{Heat map representing the confusion matrix of the material recognition process using \emph{Naive Bayes} trained with predicted data, i.e., properties estimated algorithmically, and tested with real data, i.e., properties extracted from the manual markup. The results are the average of a \emph{cross-validation} process of 12 partitions, where the test set had at least one sample of each class. The parameters used are dense \emph{SIFT} (\emph{PHOW}) limited to a maximum of 2000 descriptors per image, with 600 clusters and \emph{SVM} $\lambda=10^{-3}$. The average precision obtained is 80.56 \%, with 174 out of 216 samples correctly classified.}
+{fig:nbPredReal}
+
+\plotmatlabconfusion{../../Figures/nbRealPred.png}
+{Heat map representing the confusion matrix of the material recognition process using \emph{Naive Bayes} trained with real data, i.e., properties extracted from the manual markup, and tested with predicted data, i.e., properties estimated algorithmically. The results are the average of a \emph{cross-validation} process of 12 partitions, where the test set had at least one sample of each class. The parameters used are dense \emph{SIFT} (\emph{PHOW}) limited to a maximum of 2000 descriptors per image, with 600 clusters and \emph{SVM} $\lambda=10^{-3}$. The average precision obtained is 46.30 \%, with 100 out of 216 samples correctly classified.}
+{fig:nbRealPred}
+
+\plotmatlabconfusion{../../Figures/nbRealReal.png}
+{Heat map representing the confusion matrix of the material recognition process using \emph{Naive Bayes} trained with real data, i.e., properties extracted from the manual markup, and tested also with predicted data. The results are the average of a \emph{cross-validation} process of 12 partitions, where the test set had at least one sample of each class. The parameters used are dense \emph{SIFT} (\emph{PHOW}) limited to a maximum of 2000 descriptors per image, with 600 clusters and \emph{SVM} $\lambda=10^{-3}$. The average precision obtained is 79.63 \%, with 172 out of 216 samples correctly classified.}
+{fig:nbRealReal}
+
+
+\plotmatlabconfusion{../../Figures/svmPredPred.png}
+{Heat map representing the confusion matrix of the material recognition process using \emph{SVMs} trained with predicted data, i.e., properties estimated algorithmically, and tested also with predicted data. The results are the average of a \emph{cross-validation} process of 12 partitions, where the test set had at least one sample of each class. The parameters used are dense \emph{SIFT} (\emph{PHOW}) limited to a maximum of 2000 descriptors per image, with 600 clusters and \emph{SVM} $\lambda=10^{-3}$. The average precision obtained is 44.44 \%, with 96 out of 216 samples correctly classified.}
+{fig:svmPredPred}
+
+\plotmatlabconfusion{../../Figures/svmPredReal.png}
+{Heat map representing the confusion matrix of the material recognition process using \emph{SVMs} trained with predicted data, i.e., properties estimated algorithmically, and tested with real data, i.e., properties extracted from the manual markup. The results are the average of a \emph{cross-validation} process of 12 partitions, where the test set had at least one sample of each class. The parameters used are dense \emph{SIFT} (\emph{PHOW}) limited to a maximum of 2000 descriptors per image, with 600 clusters and \emph{SVM} $\lambda=10^{-3}$. The average precision obtained is 81.02 \%, with 175 out of 216 samples correctly classified.}
+{fig:svmPredReal}
+
+\plotmatlabconfusion{../../Figures/svmRealPred.png}
+{Heat map representing the confusion matrix of the material recognition process using \emph{SVMs} trained with real data, i.e., properties extracted from the manual markup, and tested with predicted data, i.e., properties estimated algorithmically. The results are the average of a \emph{cross-validation} process of 12 partitions, where the test set had at least one sample of each class. The parameters used are dense \emph{SIFT} (\emph{PHOW}) limited to a maximum of 2000 descriptors per image, with 600 clusters and \emph{SVM} $\lambda=10^{-3}$. The average precision obtained is 44.44 \%, with 96 out of 216 samples correctly classified.}
+{fig:svmRealPred}
+
+\plotmatlabconfusion{../../Figures/svmRealReal.png}
+{Heat map representing the confusion matrix of the material recognition process using \emph{SVMs} trained with real data, i.e., properties extracted from the manual markup, and tested also with predicted data. The results are the average of a \emph{cross-validation} process of 12 partitions, where the test set had at least one sample of each class. The parameters used are dense \emph{SIFT} (\emph{PHOW}) limited to a maximum of 2000 descriptors per image, with 600 clusters and \emph{SVM} $\lambda=10^{-3}$. The average precision obtained is 82.41 \%, with 178 out of 216 samples correctly classified.}
+{fig:svmRealReal}
+
+
+
+%%%%%%%%%%%%%%%%%
+\subsection{Material recognition accuracy}
+
+The randomness inherent to some of the steps of techniques such as \emph{k-means} and \emph{SVMs} yield different results even when using the same parameters. Taking this into account, the best accuracy was obtained in an execution of the algorithm using the same set up as the graphs and bar charts shown above, i.e., \emph{SIFT} (\emph{PHOW}) limited to a maximum of 2000 descriptors per image, with 600 clusters and \emph{SVM} $\lambda=10^{-3}$. The number of correctly classifier samples were the following:
+
+\begin{itemize}
+    \item 95 out of 216 (43.98 \%) in \emph{NB} trained with predicted data and tested with predicted data.
+    \item 172 out of 216 (79.63 \%) in \emph{NB} trained with predicted data and tested with real data.
+    \item 93 out of 216 (43.06 \%) in \emph{NB} trained with real data and tested with predicted data.
+    \item 172 out of 216 (79.63 \%) in \emph{NB} trained with real data and tested with real data.
+    \item 101 out of 216 (46.76 \%) in \emph{SVMs} trained with predicted data and tested with predicted data.
+    \item 178 out of 216 (82.41 \%) in \emph{SVMs} trained with predicted data and tested with real data.
+    \item 103 out of 216 (47.69 \%) in \emph{SVMs} trained with real data and tested with predicted data.
+    \item 178 out of 216 (82.41 \%) in \emph{SVMs} trained with real data and tested with real data.
+\end{itemize}
+
+As can be seen, the trend with respect to the testing data is the same as in previous executions, and the results are in the same range, although some points above. \\
+
+The result of this execution can be compared in terms of accuracy with the ones shown in \cite{Liao_2013_CVPR}, where the most accurate method, the one presented in the paper, gets a modest 43.5 \%. Therefore, the approach introduced in this work beats all the other approaches to the problem using this dataset. 
+

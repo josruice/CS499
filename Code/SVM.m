@@ -176,10 +176,6 @@ if verbose >= 1
     % Print the resulting accuracies.
     accuraciesArray = extractFromCell(accuraciesCellArray, 2);
     fprintf(STDOUT, 'Mean accuracy: %.2f. ', mean(accuraciesArray) * 100);
-    %fprintf(STDOUT, '%s:\n', modality);
-    %fprintf(STDOUT, ' - Mean accuracy: %.2f\n', mean(accuraciesArray) * 100);
-    %fprintf(STDOUT, ' - Min accuracy: %.2f\n', min(accuraciesArray) * 100);
-    %fprintf(STDOUT, ' - Max accuracy: %.2f\n\n', max(accuraciesArray) * 100);
 
     if verbose >= 2
         % Plot chart of accuracies.
@@ -251,5 +247,6 @@ if verbose >= 1
         xLabelsCellArray = sortedPrecisionClassNameCellArray;
         color = 'g';
         plotAccuraciesBarGraph(figureName, xArray, xLabelsCellArray, color);
+        pause;
     end
 end

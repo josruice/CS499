@@ -1,0 +1,30 @@
+%!TEX root = final_report.tex
+
+\section{Approach motivation} \label{sec:approach}
+
+The novelty of the approach strives in the intermediate step of obtaining the material properties in the process of recognition. In other words, instead of trying to infer the class directly from the image descriptors, the properties of the materials are obtained first, and from them, the class of the material. Therefore, its effectiveness depends on the following:
+
+\begin{itemize}
+    \item The image feature descriptors, along with the quantization process, are powerful enough to capture precisely the subtleties that determine if a material image presents certain property at a specific scale.
+    \item The vocabulary of properties and scales is sufficiently wide and varied to allow a clear distinction between materials. 
+\end{itemize}
+
+The ability to choose the most suitable techniques to address this issues will determine the accuracy of the approach.
+
+\subsection{Advantages}
+
+Thanks to the intermediate classification step, the approach presents several clear advantages:
+
+\begin{itemize} 
+    \item In case of absolute lack of samples of one class, the approach would, at least, be able to compute its properties if they are present in other samples of the dataset.
+    \item A classification of an image with only one training sample of that same material would be possible with relative robustness, again, if its properties are present in other samples.
+\end{itemize}   
+
+\subsection{Drawbacks}
+
+Also, some drawbacks are inherent to the use of more steps in the classification process:
+
+\begin{itemize}
+    \item The recognition of material properties is based on a supervised learning that requires a costly manual markup of the properties. Unfortunately, the more powerful, varied and precise the vocabulary, the more costly the process of marking the images.
+    \item The computational cost of the algorithm increases because of the double recognition problem, first properties, then materials.
+\end{itemize}

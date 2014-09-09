@@ -1,10 +1,10 @@
 function [estimatedLabelsArray, bayesClassifier, confusionMatrix] =          ...
-    naiveBayes (featuresMatrix, realClassLabelsArray, nSamplesPerClassArray, ...
-                modality, varargin)
+    naiveBayes (featuresMatrix, realClassLabelsArray, nClasses, modality,    ...
+                varargin)
 % naiveBayes Classifies the given samples using Naive Bayes.
 %
 %   [estimatedLabelsArray, bayesClassifier, confusionMatrix] = naiveBayes(
-%       featuresMatrix, realClassLabelsArray, nSamplesPerClassArray, modality)
+%       featuresMatrix, realClassLabelsArray, nClasses, modality)
 %   returns the estimated labels, bayes classifier and confusion matrix that 
 %   result of the classification process of the given feature vectors using ...
 %   
@@ -25,7 +25,7 @@ parser = inputParser;
 % Add required and parametrized arguments.
 parser.addRequired(FEATURES_PARAM, @(x) length(x)>0);
 parser.addRequired(LABELS_PARAM, @(x) length(x)>0);
-parser.addRequired(NUMBER_OF_SAMPLES_PER_CLASS_PARAM, @(x) length(x)>0);
+parser.addRequired(NUMBER_OF_CLASSES_PARAM, @isnumeric);
 parser.addRequired(MODALITY_PARAM, @isstr);
 
 parser.addParamValue(BAYES_CLASSIFIER_PARAM, DEFAULT_BAYES_CLASSIFIER, ...
@@ -33,14 +33,14 @@ parser.addParamValue(BAYES_CLASSIFIER_PARAM, DEFAULT_BAYES_CLASSIFIER, ...
 parser.addParamValue(VERBOSE_PARAM, DEFAULT_VERBOSE, @isnumeric);
 
 % Parse input arguments.
-parser.parse(featuresMatrix, realClassLabelsArray, nSamplesPerClassArray, ...
-             modality, varargin{:});
+parser.parse(featuresMatrix, realClassLabelsArray, nClasses, modality, ...
+             varargin{:});
 inputs = parser.Results;
 
 % Read the arguments.
 featuresMatrix = inputs.(FEATURES_PARAM);
 realClassLabelsArray = inputs.(LABELS_PARAM); 
-nSamplesPerClassArray = inputs.(NUMBER_OF_SAMPLES_PER_CLASS_PARAM);
+nClasses = inputs.(NUMBER_OF_CLASSES_PARAM);
 modality = inputs.(MODALITY_PARAM);
 
 bayesClassifier = inputs.(BAYES_CLASSIFIER_PARAM);
@@ -53,7 +53,7 @@ if not(modalityAllowed)
 end
 
 % Variables to improve code legibility.
-nClasses = length(nSamplesPerClassArray);
+nSamplesPerClassArray = accumarray(realClassLabelsArray, 1, [nClasses,1]);
 [nSamples, nFeaturesPerSample] = size(featuresMatrix);
 
 if strcmpi(modality, TRAINING_MODALITY)

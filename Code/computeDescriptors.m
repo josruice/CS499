@@ -20,6 +20,9 @@ function descriptorsCellArray = computeDescriptors (filePathsCellArray, ...
 %   MaxDescriptorsPerImage::
 %       Maximum number of computed descriptors per image. By default, the 
 %       maximum is infinite, equivalent to using value 0.
+%
+%   Verbose:: 0
+%       Determines the level of verbosity of the execution.
 
 % Load constants file.
 loadConstants;
@@ -34,6 +37,7 @@ parser.addParamValue(FEATURE_EXTRACTOR_PARAM, DEFAULT_FEATURE_EXTRACTOR, ...
                      @isstr);
 parser.addParamValue(MAX_DESCRIPTORS_PER_IMAGE_PARAM, ...
                      DEFAULT_MAX_DESCRIPTORS_PER_IMAGE, @isnumeric);
+parser.addParamValue(VERBOSE_PARAM, DEFAULT_VERBOSE, @isnumeric);
 
 % Parse input arguments.
 parser.parse(filePathsCellArray, varargin{:});
@@ -44,6 +48,7 @@ filePathsCellArray = inputs.(FILE_PATHS_PARAM);
 imagePart = inputs.(IMAGE_PART_PARAM); 
 featureExtractor = inputs.(FEATURE_EXTRACTOR_PARAM);
 maxDescriptorsPerImage = inputs.(MAX_DESCRIPTORS_PER_IMAGE_PARAM);
+verbose = inputs.(VERBOSE_PARAM);
 
 % Create a cell array to store the descriptor matrices.
 nFiles = length(filePathsCellArray);
@@ -101,17 +106,17 @@ for iFile = 1:nFiles,
     %  - The size of matrix D will be [128 num_descriptors].
     switch featureExtractor
     case FEATURE_EXTRACTOR_PHOW
-        [~, D] = vl_phow(image);
+        [F, D] = vl_phow(image);
     case FEATURE_EXTRACTOR_SIFT
         if ndims(image) == 3
             image = rgb2gray(image); % Gray scale. SIFT requirement.
         end
-        [~, D] = vl_sift(image);
+        [F, D] = vl_sift(image);
     case FEATURE_EXTRACTOR_DSIFT
         if ndims(image) == 3
             image = rgb2gray(image); % Gray scale. DSIFT requirement.
         end
-        [~, D] = vl_dsift(image);
+        [F, D] = vl_dsift(image);
     otherwise
         % Never supposed to happend.
     end
@@ -120,9 +125,39 @@ for iFile = 1:nFiles,
     nDescriptors = size(D, 2);
     if maxDescriptorsPerImage < nDescriptors && ...
        maxDescriptorsPerImage ~= INFINITE_DESCRIPTORS_PER_IMAGE
-       D = D(:, randperm(nDescriptors, maxDescriptorsPerImage));
+       indices = randperm(nDescriptors, maxDescriptorsPerImage);
+       D = D(:, indices);
+       F = F(:, indices);
     end
-       
+    
     % Store the descriptors.
     descriptorsCellArray{iFile} = D;
+
+    if verbose >= 3
+        % Plot keypoints.
+        fig1 = figure('Name', sprintf('%s keypoints', featureExtractor), ...
+                      'Position', [100 200 500 500]);
+        imshow(image, 'Border', 'tight', 'InitialMagnification', 150);
+        hold on;
+        f1 = vl_plotframe(F);
+        f2 = vl_plotframe(F);
+        set(f1, 'color', 'k', 'linewidth', 3);
+        set(f2, 'color', 'y', 'linewidth', 2);
+
+        % Plot descriptors.
+        fig2 = figure('Name', sprintf('%s descriptors', featureExtractor), ...
+                      'Position', [750 200 500 500]);
+        imshow(image, 'Border', 'tight', 'InitialMagnification', 150);
+        hold on;
+        f3 = vl_plotframe(F);
+        f4 = vl_plotframe(F);
+        set(f3, 'color', 'k', 'linewidth', 3);
+        set(f4, 'color', 'y', 'linewidth', 2);
+        f5 = vl_plotsiftdescriptor(D, F);
+        set(f5, 'color', 'g');
+        
+        pause;
+        close(fig1);
+        close(fig2);
+    end
 end
